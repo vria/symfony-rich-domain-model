@@ -1,0 +1,5 @@
+App\Domain\AbsenceType:
+  type: embeddable
+  fields:
+    type:
+      type: integer

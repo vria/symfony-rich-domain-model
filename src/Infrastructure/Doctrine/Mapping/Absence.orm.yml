@@ -1,0 +1,21 @@
+App\Domain\Absence:
+  type: entity
+  embedded:
+    type:
+      class: App\Domain\AbsenceType
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    debut:
+      type: datetime_immutable
+    fin:
+      type: datetime_immutable
+  manyToOne:
+    personne:
+      targetEntity: App\Domain\Personne
+      joinColumn:
+        name: personne_email
+        referencedColumnName: email

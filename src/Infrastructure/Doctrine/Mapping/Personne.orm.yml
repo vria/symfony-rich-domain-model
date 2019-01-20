@@ -1,0 +1,13 @@
+App\Domain\Personne:
+  type: entity
+  id:
+    email:
+      type: string
+  fields:
+    nom:
+      type: string
+  oneToMany:
+    absences:
+      targetEntity: App\Domain\Absence
+      mappedBy: personne
+      cascade: ["persist", "remove", "refresh"]
