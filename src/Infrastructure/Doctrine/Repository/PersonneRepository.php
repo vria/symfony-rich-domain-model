@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Doctrine\Repository;
 
+use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -35,6 +36,10 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     public function get(string $email): Personne
     {
         $personne = $this->find($email);
+        if (!$personne instanceof Personne) {
+            throw new PersonneNotFoundException('Personne '.$email." n'est pas trouvée");
+        }
+
         $personneRepositoryReflProp = (new \ReflectionClass(Personne::class))->getProperty('personneRepository');
         $personneRepositoryReflProp->setAccessible(true);
         $personneRepositoryReflProp->setValue($personne, $this);

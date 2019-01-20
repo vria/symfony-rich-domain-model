@@ -21,6 +21,9 @@ class PersonneUpdateDTO
 {
     /**
      * @var string
+     *
+     * @Assert\NotBlank()
+     * @Assert\Email()
      */
     public $email;
 

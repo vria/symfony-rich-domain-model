@@ -16,7 +16,7 @@ services:
                             # The best practice is to be explicit about your dependencies anyway.
 
     App\Application\:
-        resource: '../src/Application/{Form,Service}'
+        resource: '../src/Application/{Form,Service,Command}'
 
     App\Infrastructure\Doctrine\Repository\:
         resource: '../src/Infrastructure/Doctrine/Repository'

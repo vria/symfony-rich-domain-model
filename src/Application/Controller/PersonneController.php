@@ -41,7 +41,7 @@ class PersonneController
      *
      * @return array
      */
-    public function listPerson(PersonneRepositoryInterface $personneRepository)
+    public function listPersonnes(PersonneRepositoryInterface $personneRepository)
     {
         return [
             'personnes' => $personneRepository->getAll()
@@ -61,7 +61,7 @@ class PersonneController
      *
      * @return array|RedirectResponse
      */
-    public function createPerson(Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory)
+    public function createPersonne(Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory)
     {
         $personneCreteDTO = new PersonneCreateDTO();
         $form = $formFactory->create(PersonneCreateType::class, $personneCreteDTO);
@@ -97,12 +97,12 @@ class PersonneController
      *
      * @return array|RedirectResponse
      */
-    public function updatePerson(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory, PersonneRepositoryInterface $personneRepository)
+    public function updatePersonne(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory, PersonneRepositoryInterface $personneRepository)
     {
         try {
             $personne = $personneRepository->get($email);
         } catch (PersonneNotFoundException $e) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
         $personneUpdateDTO = new PersonneUpdateDTO($personne->getEmail(), $personne->getNom());
