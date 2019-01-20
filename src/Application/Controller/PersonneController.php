@@ -10,22 +10,30 @@ use App\Application\Form\PersonneCreateType;
 use App\Application\Form\PersonneUpdateType;
 use App\Application\Service\PersonneFactory;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
+use App\Domain\Exception\AbsenceInvalidDatesException;
 use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
+ * Contrôleur qui contient differentes actions liée à la gestion d'une @see Personne.
+ *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class PersonneController
 {
     /**
+     * Lister toutes les personnes.
+     *
      * @Route("/", name="person_list")
      * @Template()
      *
@@ -41,6 +49,8 @@ class PersonneController
     }
 
     /**
+     * Créer une personne.
+     *
      * @Route("/create", name="person_create")
      * @Template()
      *
@@ -73,6 +83,8 @@ class PersonneController
     }
 
     /**
+     * Modifier les données d'une personne.
+     *
      * @Route("/update/{email}", name="person_update")
      * @Template()
      *
@@ -87,7 +99,12 @@ class PersonneController
      */
     public function updatePerson(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory, PersonneRepositoryInterface $personneRepository)
     {
-        $personne = $personneRepository->get($email);
+        try {
+            $personne = $personneRepository->get($email);
+        } catch (PersonneNotFoundException $e) {
+            throw new NotFoundHttpException();
+        }
+
         $personneUpdateDTO = new PersonneUpdateDTO($personne->getEmail(), $personne->getNom());
         $form = $formFactory->create(PersonneUpdateType::class, $personneUpdateDTO);
         $form->handleRequest($request);
@@ -108,6 +125,8 @@ class PersonneController
     }
 
     /**
+     * Déposer une absence.
+     *
      * @Route("/deposer-absence/{email}", name="person_deposer_absence")
      * @Template()
      *
@@ -122,18 +141,23 @@ class PersonneController
      */
     public function deposerAbsence(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneFactory $personneFactory, PersonneRepositoryInterface $personneRepository)
     {
-        $personne = $personneRepository->get($email);
-        $deposerAbsenceDTO = new DeposerAbsenceDTO($personne->getEmail());
+        try {
+            $personne = $personneRepository->get($email);
+        } catch (PersonneNotFoundException $e) {
+            throw new NotFoundHttpException();
+        }
 
+        $deposerAbsenceDTO = new DeposerAbsenceDTO($personne->getEmail());
         $form = $formFactory->create(DeposerAbsenceType::class, $deposerAbsenceDTO);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             try {
                 $personneFactory->deposerAbsence($personne, $deposerAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('person_list'));
+            } catch (AbsenceInvalidDatesException $e) {
+                $form->get('fin')->addError(new FormError($e->getMessage()));
             } catch (AbsenceAlreadyTakenException $e) {
                 $form->get('debut')->addError(new FormError($e->getMessage()));
             }

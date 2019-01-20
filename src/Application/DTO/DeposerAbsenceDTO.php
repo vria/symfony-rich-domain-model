@@ -2,15 +2,26 @@
 
 namespace App\Application\DTO;
 
-use App\Domain\AbsenceType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * Objet de transfert de données pour:
+ * @see \App\Application\Controller\PersonneController::deposerAbsence()
+ * @see \App\Application\Service\PersonneFactory::deposerAbsence()
+ * @see \App\Application\Form\DeposerAbsenceType
+ *
+ * Les champs de cet objet sont validés lors de soumission du formulaire.
+ *
+ * Finalement les données seront passées dans:
+ * @see \App\Domain\Personne::deposerAbsence()
+ *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class DeposerAbsenceDTO
 {
     /**
+     * L'email d'une personne n'est pas modifiable lors du dépôt d'absence.
+     *
      * @var string
      */
     private $email;

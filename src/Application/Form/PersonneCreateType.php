@@ -3,14 +3,17 @@
 namespace App\Application\Form;
 
 use App\Application\DTO\PersonneCreateDTO;
-use App\Domain\Personne;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Validator\Constraints as DoctrineAssert;
 
 /**
+ * Formulaire pour créer une nouvelle personne.
+ *
+ * @see \App\Application\Controller\PersonneController::createPerson()
+ *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class PersonneCreateType extends AbstractType
@@ -24,7 +27,9 @@ class PersonneCreateType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Email',
             ])
-            ->add('nom')
+            ->add('nom', TextType::class, [
+                'label' => 'Nom',
+            ])
         ;
     }
 

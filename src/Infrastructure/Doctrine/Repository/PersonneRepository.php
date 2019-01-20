@@ -24,7 +24,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     /**
      * @inheritdoc
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->findAll();
     }
@@ -32,7 +32,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     /**
      * @inheritdoc
      */
-    public function get(string $email)
+    public function get(string $email): Personne
     {
         $personne = $this->find($email);
         $personneRepositoryReflProp = (new \ReflectionClass(Personne::class))->getProperty('personneRepository');
@@ -45,7 +45,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     /**
      * @inheritdoc
      */
-    public function save(Personne $personne)
+    public function save(Personne $personne): void
     {
         $this->_em->persist($personne);
         $this->_em->flush($personne);
@@ -54,10 +54,11 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     /**
      * @inheritdoc
      */
-    public function emailAlreadyExist(string $email)
+    public function emailAlreadyExist(string $email): bool
     {
         try {
             return $this->createQueryBuilder('p')
+                    ->select('COUNT(p)')
                     ->andWhere('p.email = :email')
                     ->setParameter('email', $email)
                     ->getQuery()
@@ -70,11 +71,11 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     /**
      * @inheritdoc
      */
-    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
+    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin): bool
     {
         try {
             return $this->createQueryBuilder('p')
-                    ->select('count(a)')
+                    ->select('COUNT(a)')
                     ->innerJoin('p.absences', 'a')
                     ->andWhere('p = :personne')
                     ->andWhere('a.debut <= :fin')

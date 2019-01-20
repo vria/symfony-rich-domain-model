@@ -1,4 +1,6 @@
 Rich domain model in Symfony application
 ========================================
 
-Work in progress...
+Readme arrive bientôt.
+
+Veuillez regarder les commentaires dans les fichiers sources.

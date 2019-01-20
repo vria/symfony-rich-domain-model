@@ -2,7 +2,9 @@
 
 {% block body %}
     <h3>Liste des personnes</h3>
-    <a href="{{ path('person_create') }}" class="btn btn-primary">Ajouter</a>
+    <a href="{{ path('person_create') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Ajouter
+    </a>
 
     <table class="table">
         <thead>
@@ -18,8 +20,12 @@
                 <td>{{ personne.email }}</td>
                 <td>{{ personne.nom }}</td>
                 <td>
-                    <a href="{{ path('person_update', {email: personne.email}) }}">Modifier</a>
-                    <a href="{{ path('person_deposer_absence', {email: personne.email}) }}">Deposer une absence</a>
+                    <a href="{{ path('person_update', {email: personne.email}) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-user-edit"></i> Modifier
+                    </a>
+                    <a href="{{ path('person_deposer_absence', {email: personne.email}) }}" class="btn btn-primary btn-sm">
+                        <i class="far fa-calendar-check"></i> Deposer une absence
+                    </a>
                 </td>
             </tr>
         {% endfor %}

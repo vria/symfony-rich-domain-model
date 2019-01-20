@@ -1,35 +1,48 @@
 <?php
 
 namespace App\Domain;
+use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceTypeInvalidException;
 
 /**
- * @author Vlad Riabchenko <vriabchenko@webnet.fr>
+ * Une absence déposée.
+ * C'est une entité qui est cachée dans un agrégat dont la racine est @see Personne.
  *
- * @internal
+ * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class Absence
 {
     /**
+     * Identité d'une absence qui est autogénérée.
+     *
      * @var int
      */
     private $id;
 
     /**
+     * Personne pour laquelle cette absence a été déposée.
+     *
      * @var Personne
      */
     private $personne;
 
     /**
+     * Type d'absence.
+     *
      * @var AbsenceType
      */
     private $type;
 
     /**
+     * Date de début.
+     *
      * @var \DateTimeImmutable
      */
     private $debut;
 
     /**
+     * Date de fin.
+     *
      * @var \DateTimeImmutable
      */
     private $fin;
@@ -39,11 +52,14 @@ class Absence
      * @param int $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
+     *
+     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceTypeInvalidException
      */
     public function __construct(Personne $personne, int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
         if ($debut > $fin) {
-            throw new \InvalidArgumentException('Date de début doit être avant la date de fin');
+            throw new AbsenceInvalidDatesException('Date de fin doit être après la date de début');
         }
 
         $this->personne = $personne;
