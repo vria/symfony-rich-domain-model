@@ -1,6 +1,14 @@
 {
     "type": "project",
     "license": "proprietary",
+    "name": "vria/symfony-rich-domain-model",
+    "description": "Rich domain model in Symfony application",
+    "authors": [
+        {
+            "name": "Riabchenko Vlad",
+            "email": "vriabchenko@webnet.fr"
+        }
+    ],
     "require": {
         "php": "^7.1.3",
         "ext-ctype": "*",
@@ -64,7 +72,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "4.1.*"
+            "require": "4.2.*"
         }
     }
 }
