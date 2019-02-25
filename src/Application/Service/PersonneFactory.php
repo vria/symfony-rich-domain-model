@@ -10,6 +10,7 @@ use App\Domain\Exception\AbsenceInvalidDatesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use App\Domain\Personne;
+use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 
 /**
@@ -28,11 +29,17 @@ class PersonneFactory
     private $personneRepository;
 
     /**
+     * @var AbsenceRepositoryInterface
+     */
+    private $absenceRepository;
+
+    /**
      * @param PersonneRepositoryInterface $personneRepository
      */
-    public function __construct(PersonneRepositoryInterface $personneRepository)
+    public function __construct(PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
     {
         $this->personneRepository = $personneRepository;
+        $this->absenceRepository = $absenceRepository;
     }
 
     /**
@@ -44,7 +51,7 @@ class PersonneFactory
      */
     public function create(PersonneCreateDTO $personneCreateDTO)
     {
-        $personne = new Personne($personneCreateDTO->email, $personneCreateDTO->nom, $this->personneRepository);
+        $personne = new Personne($personneCreateDTO->email, $personneCreateDTO->nom, $this->personneRepository, $this->absenceRepository);
 
         $this->personneRepository->save($personne);
     }

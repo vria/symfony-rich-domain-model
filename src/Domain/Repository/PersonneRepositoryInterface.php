@@ -45,15 +45,4 @@ interface PersonneRepositoryInterface
      * @return bool
      */
     public function emailAlreadyExist(string $email): bool;
-
-    /**
-     * Vérifier s'il existe déjà une absence qui chevauche les dates fournies.
-     *
-     * @param Personne $personne
-     * @param \DateTimeImmutable $debut
-     * @param \DateTimeImmutable $fin
-     *
-     * @return bool
-     */
-    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin): bool;
 }

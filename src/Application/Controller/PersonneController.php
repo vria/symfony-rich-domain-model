@@ -167,4 +167,36 @@ class PersonneController
             'form' => $form->createView()
         ];
     }
+
+    /**
+     * Déposer une absence.
+     *
+     * @Route("/absence-calendar/{email}/{startPeriod?}/{endPeriod?}", name="person_deposer_absence")
+     * @Template()
+     *
+     * @param PersonneRepositoryInterface $personneRepository
+     * @param string $email
+     * @param string $startPeriod
+     * @param string $endPeriod
+     *
+     * @return array
+     */
+    public function viewAbsenceCalendar(PersonneRepositoryInterface $personneRepository, string $email, string $startPeriod = null, string $endPeriod = null)
+    {
+        try {
+            $personne = $personneRepository->get($email);
+        } catch (PersonneNotFoundException $e) {
+            throw new NotFoundHttpException();
+        }
+
+        $startPeriod = new \DateTimeImmutable($startPeriod ?? 'monday this week');
+        $endPeriod = new \DateTimeImmutable($endPeriod ?? 'sunday this week');
+
+        return [
+            'personne' => $personne,
+            'startPeriod' => $startPeriod,
+            'endPeriod' => $endPeriod,
+            'absences' => $personne->getAbsences($startPeriod, $endPeriod),
+        ];
+    }
 }

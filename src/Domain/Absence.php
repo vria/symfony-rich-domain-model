@@ -10,93 +10,13 @@ use App\Domain\Exception\AbsenceTypeInvalidException;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class Absence
+class Absence extends AbsenceImmutable
 {
     /**
-     * Identité d'une absence qui est autogénérée.
-     *
-     * @var int
+     * @return AbsenceImmutable
      */
-    private $id;
-
-    /**
-     * Personne pour laquelle cette absence a été déposée.
-     *
-     * @var Personne
-     */
-    private $personne;
-
-    /**
-     * Type d'absence.
-     *
-     * @var AbsenceType
-     */
-    private $type;
-
-    /**
-     * Date de début.
-     *
-     * @var \DateTimeImmutable
-     */
-    private $debut;
-
-    /**
-     * Date de fin.
-     *
-     * @var \DateTimeImmutable
-     */
-    private $fin;
-
-    /**
-     * @param Personne $personne
-     * @param int $type
-     * @param \DateTimeImmutable $debut
-     * @param \DateTimeImmutable $fin
-     *
-     * @throws AbsenceInvalidDatesException
-     * @throws AbsenceTypeInvalidException
-     */
-    public function __construct(Personne $personne, int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
+    public function getAbsenceImmutable()
     {
-        if ($debut > $fin) {
-            throw new AbsenceInvalidDatesException('Date de fin doit être après la date de début');
-        }
-
-        $this->personne = $personne;
-        $this->type = new AbsenceType($type);
-        $this->debut = $debut;
-        $this->fin = $fin;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return AbsenceType
-     */
-    public function getType(): AbsenceType
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getDebut(): \DateTimeImmutable
-    {
-        return $this->debut;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getFin(): \DateTimeImmutable
-    {
-        return $this->fin;
+        return new AbsenceImmutable($this->personne, $this->type->getType(), $this->debut, $this->fin);
     }
 }

@@ -30,3 +30,4 @@ services:
     # please note that last definitions always *replace* previous ones
 
     App\Domain\Repository\PersonneRepositoryInterface: '@App\Infrastructure\Doctrine\Repository\PersonneRepository'
+    App\Domain\Repository\AbsenceRepositoryInterface: '@App\Infrastructure\Doctrine\Repository\AbsenceRepository'

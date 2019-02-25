@@ -50,6 +50,24 @@ class AbsenceType
     }
 
     /**
+     * @param $type
+     *
+     * @return string
+     */
+    public static function getLabel($type)
+    {
+        switch ($type) {
+            case AbsenceType::MALADIE:
+                return 'Maladie';
+
+            case AbsenceType::CONGES_PAYES:
+                return 'Congé payé';
+        }
+
+        throw new \InvalidArgumentException;
+    }
+
+    /**
      * La comparaison d'égalité est une méthode quasi-obligatoire dans les objets-valeurs.
      *
      * @param AbsenceType $absenceType

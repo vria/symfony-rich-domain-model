@@ -5,6 +5,7 @@ use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceInvalidDatesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
 use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 
 /**
@@ -59,13 +60,17 @@ class Personne
     private $personneRepository;
 
     /**
+     * @var AbsenceRepositoryInterface
+     */
+    private $absenceRepository;
+
+    /**
      * @param string $email
      * @param string $nom
      * @param PersonneRepositoryInterface $personneRepository
-     *
-     * @throws EmailAlreadyTakenException
+     * @param AbsenceRepositoryInterface $absenceRepository
      */
-    public function __construct(string $email, string $nom, PersonneRepositoryInterface $personneRepository)
+    public function __construct(string $email, string $nom, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
     {
         // Vérifier que l'email n'est pas encore enregistré.
         if ($personneRepository->emailAlreadyExist($email)) {
@@ -76,6 +81,7 @@ class Personne
         $this->nom = $nom;
         $this->absences = [];
         $this->personneRepository = $personneRepository;
+        $this->absenceRepository = $absenceRepository;
     }
 
     /**
@@ -124,11 +130,22 @@ class Personne
      */
     public function deposerAbsence(\DateTimeImmutable $debut, \DateTimeImmutable $fin, int $type)
     {
-        if ($this->personneRepository->absenceAlreadyExist($this, $debut, $fin)) {
+        if ($this->absenceRepository->absenceAlreadyExist($this, $debut, $fin)) {
             throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
         }
 
         $absence = new Absence($this, $type, $debut, $fin);
         $this->absences[] = $absence;
+    }
+
+    /**
+     * @param \DateTimeImmutable $startPeriod
+     * @param \DateTimeImmutable $endPeriod
+     *
+     * @return AbsenceImmutable[]
+     */
+    public function getAbsences(\DateTimeImmutable $startPeriod, \DateTimeImmutable $endPeriod)
+    {
+        return $this->absenceRepository->getImmutableAbsences($this, $startPeriod, $endPeriod);
     }
 }

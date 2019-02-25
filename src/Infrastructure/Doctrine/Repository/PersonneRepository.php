@@ -2,8 +2,10 @@
 
 namespace App\Infrastructure\Doctrine\Repository;
 
+use App\Domain\Absence;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
+use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -15,11 +17,18 @@ use Doctrine\ORM\NoResultException;
 class PersonneRepository extends ServiceEntityRepository implements PersonneRepositoryInterface
 {
     /**
+     * @var AbsenceRepositoryInterface
+     */
+    private $absenceRepository;
+
+    /**
      * @inheritdoc
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, AbsenceRepositoryInterface $absenceRepository)
     {
         parent::__construct($registry, Personne::class);
+
+        $this->absenceRepository = $absenceRepository;
     }
 
     /**
@@ -44,6 +53,10 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
         $personneRepositoryReflProp->setAccessible(true);
         $personneRepositoryReflProp->setValue($personne, $this);
 
+        $personneRepositoryReflProp = (new \ReflectionClass(Personne::class))->getProperty('absenceRepository');
+        $personneRepositoryReflProp->setAccessible(true);
+        $personneRepositoryReflProp->setValue($personne, $this->absenceRepository);
+
         return $personne;
     }
 
@@ -66,28 +79,6 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
                     ->select('COUNT(p)')
                     ->andWhere('p.email = :email')
                     ->setParameter('email', $email)
-                    ->getQuery()
-                    ->getSingleScalarResult() > 0;
-        } catch (NoResultException $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin): bool
-    {
-        try {
-            return $this->createQueryBuilder('p')
-                    ->select('COUNT(a)')
-                    ->innerJoin('p.absences', 'a')
-                    ->andWhere('p = :personne')
-                    ->andWhere('a.debut <= :fin')
-                    ->andWhere('a.fin >= :debut')
-                    ->setParameter('debut', $debut)
-                    ->setParameter('fin', $fin)
-                    ->setParameter('personne', $personne)
                     ->getQuery()
                     ->getSingleScalarResult() > 0;
         } catch (NoResultException $e) {

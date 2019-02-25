@@ -24,7 +24,10 @@
                         <i class="fas fa-user-edit"></i> Modifier
                     </a>
                     <a href="{{ path('person_deposer_absence', {email: personne.email}) }}" class="btn btn-primary btn-sm">
-                        <i class="far fa-calendar-check"></i> Deposer une absence
+                        <i class="far fa-plus"></i> Deposer une absence
+                    </a>
+                    <a href="{{ path('person_deposer_absence', {email: personne.email}) }}" class="btn btn-default btn-sm">
+                        <i class="far fa-calendar-check"></i> Calendrier
                     </a>
                 </td>
             </tr>
