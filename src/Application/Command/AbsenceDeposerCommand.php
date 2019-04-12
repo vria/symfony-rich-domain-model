@@ -3,7 +3,7 @@
 namespace App\Application\Command;
 
 use App\Application\DTO\DeposerAbsenceDTO;
-use App\Application\Service\PersonneFactory;
+use App\Application\Service\PersonneService;
 use App\Domain\AbsenceType;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class DeposerAbsenceCommand extends Command
+class AbsenceDeposerCommand extends Command
 {
     protected static $defaultName = 'app:absence:deposer';
 
@@ -32,9 +32,9 @@ class DeposerAbsenceCommand extends Command
     private $personneRepository;
 
     /**
-     * @var PersonneFactory
+     * @var PersonneService
      */
-    private $personneFactory;
+    private $personneService;
 
     /**
      * @var ValidatorInterface
@@ -43,15 +43,15 @@ class DeposerAbsenceCommand extends Command
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneFactory $personneFactory
+     * @param PersonneService $personneService
      * @param ValidatorInterface $validator
      */
-    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneFactory $personneFactory, ValidatorInterface $validator)
+    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
     {
         parent::__construct();
 
         $this->personneRepository = $personneRepository;
-        $this->personneFactory = $personneFactory;
+        $this->personneService = $personneService;
         $this->validator = $validator;
     }
 
@@ -71,6 +71,7 @@ class DeposerAbsenceCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            // Récupérer une personne demandée.
             $personnne = $this->personneRepository->get($input->getArgument('email'));
         } catch (PersonneNotFoundException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
@@ -78,7 +79,10 @@ class DeposerAbsenceCommand extends Command
             return;
         }
 
+        // Construire DTO.
         $personneUpdateDTO = new DeposerAbsenceDTO($personnne->getEmail());
+
+        // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');
 
         $question = new Question("Date de début d'absence :", $personneUpdateDTO->debut->format('Y-m-d'));
@@ -102,7 +106,8 @@ class DeposerAbsenceCommand extends Command
         }
 
         try {
-            $this->personneFactory->deposerAbsence($personnne, $personneUpdateDTO);
+            // Déposer une absence.
+            $this->personneService->deposerAbsence($personnne, $personneUpdateDTO);
 
             $output->writeln('<info>Absence a été déposée avec succès.</info>');
         } catch (AbsenceAlreadyTakenException $e) {

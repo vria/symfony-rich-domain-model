@@ -31,7 +31,7 @@ class DeposerAbsenceType extends AbstractType
                 'input' => 'datetime_immutable',
             ])
             ->add('fin', DateType::class, [
-                'label' => 'Début',
+                'label' => 'Fin',
                 'widget' => 'single_text',
                 'input' => 'datetime_immutable',
             ])
@@ -40,6 +40,7 @@ class DeposerAbsenceType extends AbstractType
                 'choices' => [
                     'Maladie' => AbsenceType::MALADIE,
                     'Congé payé' => AbsenceType::CONGES_PAYES,
+                    'Télétravail' => AbsenceType::TELETRAVAIL,
                 ]
             ])
         ;

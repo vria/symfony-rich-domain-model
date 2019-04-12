@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Domain;
+
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use App\Domain\Repository\AbsenceRepositoryInterface;
@@ -11,12 +13,12 @@ use App\Domain\Repository\PersonneRepositoryInterface;
 /**
  * Une personne.
  *
- * Cette classe est une entité et la racine d'un agrégat englobant @see Absence.
+ * Cette classe est une *entité* et la racine d'un agrégat englobant @see Absence.
  * Il existe un repository pour cette classe @see PersonneRepositoryInterface.
  * Il est conseillé que seules les racines des agrégats aient le repositories.
  *
  * Un nouveau objet de cette classe peut être instancié seulement dans deux cas :
- * - création d'une nouvelle personne dans @see \App\Application\Service\PersonneFactory::create().
+ * - création d'une nouvelle personne dans @see \App\Application\Service\PersonneService::create().
  *   Dans ce cas le @see Personne::__construct() est appelé.
  * - reconstitution d'une personne de la bdd par
  *   @see \App\Infrastructure\Doctrine\Repository\PersonneRepository::get().
@@ -42,14 +44,11 @@ class Personne
     private $nom;
 
     /**
-     * Tableau des absences déposées.
+     * Tableu des compteurs d'absence.
      *
-     * Notez que Doctrine sauvegarde toute nouvelle absence automatiquement
-     * grâce à la persistance en cascade.
-     *
-     * @var Absence[]
+     * @var CompteurAbsence[]
      */
-    private $absences;
+    private $compteursAbsence;
 
     /**
      * Répositoire de la personne.
@@ -79,7 +78,6 @@ class Personne
 
         $this->email = $email;
         $this->nom = $nom;
-        $this->absences = [];
         $this->personneRepository = $personneRepository;
         $this->absenceRepository = $absenceRepository;
     }
@@ -135,17 +133,57 @@ class Personne
         }
 
         $absence = new Absence($this, $type, $debut, $fin);
-        $this->absences[] = $absence;
+        $this->absenceRepository->save($absence);
+    }
+
+    /**
+     * @param $id
+     * @param \DateTimeImmutable $debut
+     * @param \DateTimeImmutable $fin
+     * @param int $type
+     *
+     * @throws AbsenceAlreadyTakenException
+     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceTypeInvalidException
+     */
+    public function modifierAbsence($id, \DateTimeImmutable $debut, \DateTimeImmutable $fin, int $type)
+    {
+        if ($this->absenceRepository->absenceAlreadyExist($this, $debut, $fin, $id)) {
+            throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
+        }
+
+        $absence = $this->absenceRepository->getAbsence($this, $id);
+        $absence->modify($type, $debut, $fin);
+    }
+
+    /**
+     * @param Absence $absence
+     */
+    public function annulerAbsence(Absence $absence)
+    {
+        $this->absenceRepository->annuler($absence);
     }
 
     /**
      * @param \DateTimeImmutable $startPeriod
      * @param \DateTimeImmutable $endPeriod
      *
-     * @return AbsenceImmutable[]
+     * @return Absence[]
      */
     public function getAbsences(\DateTimeImmutable $startPeriod, \DateTimeImmutable $endPeriod)
     {
-        return $this->absenceRepository->getImmutableAbsences($this, $startPeriod, $endPeriod);
+        return $this->absenceRepository->getAbsences($this, $startPeriod, $endPeriod);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return Absence
+     *
+     * @throws AbsenceNotFoundException
+     */
+    public function getAbsence($id)
+    {
+        return $this->absenceRepository->getAbsence($this, $id);
     }
 }

@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+
+{% block container_title %}
+    Absences de {{ personne.nom }} de {{ startPeriod|date('d/m/Y') }} à {{ endPeriod|date('d/m/Y') }}
+{% endblock %}
+
+
+{% block body %}
+    <div class="clearfix mb-3">
+        <a href="{{ path('personne_absence_calendrier', {email: personne.email, startPeriod: startPeriod.modify('-7 days')|date('Y-m-d') }) }}" class="float-left btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Précédente
+        </a>
+        <a href="{{ path('personne_absence_calendrier', {email: personne.email, startPeriod: startPeriod.modify('+7 days')|date('Y-m-d')}) }}" class="float-right btn btn-primary">
+            Suivante <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <table class="table" id="table-calendrier">
+        <thead>
+            <tr>
+                {% for i in range(0, 6) %}
+                    <th class="text-center">{{ startPeriod.modify('+' ~ i ~ ' days').format('d/m') }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for a in personne.absences(startPeriod, endPeriod) %}
+            {% set offset = startPeriod.diff(a.debut).format('%r%d') %}
+            {% set duration = a.debut.diff(a.fin).format('%r%d') + 1 %}
+            {% set start = offset > 0 ? offset : 0 %}
+            {% set end = offset + duration < 7 ? offset + duration : 7 %}
+
+            <tr>
+                {% if start > 0 %}<td colspan="{{ start }}"></td>{% endif %}
+
+                <td colspan="{{ end - start }}" class="bg-info text-center">
+                    <a href="{{ path('personne_absence_modifier', {email: personne.email, id: a.id}) }}" class="text-light text-decoration-none">
+                        {{ a.formatted }}
+                    </a>
+                    <a href="{{ path('personne_absence_annuler', {email: personne.email, id: a.id}) }}" class="text-light">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+
+                {% if end < 7 %}<td colspan="{{ 7 - end }}"></td>{% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        <a href="{{ path('personne_lister') }}" class="btn btn-default">
+            <i class="fas fa-arrow-left"></i> Revenir à la liste
+        </a>
+        <a href="{{ path('personne_absence_deposer', {email: personne.email}) }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Deposer une absence
+        </a>
+    </div>
+{% endblock %}

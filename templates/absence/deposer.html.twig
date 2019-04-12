@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+
+{% block container_title %}
+    Deposer une absence pour {{ form.vars.value.email }}
+{% endblock %}
+
+
+{% block body %}
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+        <div class="row">
+            <div class="col-sm">{{ form_row(form.debut) }}</div>
+            <div class="col-sm">{{ form_row(form.fin) }}</div>
+        </div>
+        {{ form_row(form.type) }}
+        <div class="mt-3">
+            <a href="{{ path('personne_absence_calendrier', {email: form.vars.value.email}) }}" class="btn btn-default">
+                <i class="fas fa-arrow-left"></i> Annuler
+            </a>
+            {% block submit_button %}
+                <button class="btn btn-primary">Déposer</button>
+            {% endblock %}
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

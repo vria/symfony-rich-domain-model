@@ -66,7 +66,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     public function save(Personne $personne): void
     {
         $this->_em->persist($personne);
-        $this->_em->flush($personne);
+        $this->_em->flush();
     }
 
     /**

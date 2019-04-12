@@ -2,8 +2,8 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\PersonneUpdateDTO;
-use App\Application\Service\PersonneFactory;
+use App\Application\DTO\CreerPersonneDTO;
+use App\Application\Service\PersonneService;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Repository\PersonneRepositoryInterface;
@@ -20,9 +20,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class UpdatePersonneCommand extends Command
+class PersonneModifierCommand extends Command
 {
-    protected static $defaultName = 'app:personnes:update';
+    protected static $defaultName = 'app:personne:modifier';
 
     /**
      * @var PersonneRepositoryInterface
@@ -30,9 +30,9 @@ class UpdatePersonneCommand extends Command
     private $personneRepository;
 
     /**
-     * @var PersonneFactory
+     * @var PersonneService
      */
-    private $personneFactory;
+    private $personneSerivce;
 
     /**
      * @var ValidatorInterface
@@ -41,15 +41,15 @@ class UpdatePersonneCommand extends Command
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneFactory $personneFactory
+     * @param PersonneService $personneService
      * @param ValidatorInterface $validator
      */
-    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneFactory $personneFactory, ValidatorInterface $validator)
+    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
     {
         parent::__construct();
 
         $this->personneRepository = $personneRepository;
-        $this->personneFactory = $personneFactory;
+        $this->personneSerivce = $personneService;
         $this->validator = $validator;
     }
 
@@ -68,6 +68,7 @@ class UpdatePersonneCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            // Récupérer une personne demandée.
             $personnne = $this->personneRepository->get($input->getArgument('email'));
         } catch (PersonneNotFoundException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
@@ -75,7 +76,10 @@ class UpdatePersonneCommand extends Command
             return;
         }
 
-        $personneUpdateDTO = new PersonneUpdateDTO($personnne->getEmail(), $personnne->getNom());
+        // Construire DTO.
+        $personneUpdateDTO = CreerPersonneDTO::fromPerson($personnne);
+
+        // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');
 
         $question = new Question('Email: ', $personneUpdateDTO->email);
@@ -96,7 +100,8 @@ class UpdatePersonneCommand extends Command
         }
 
         try {
-            $this->personneFactory->update($personnne, $personneUpdateDTO);
+            // Modifier une personne.
+            $this->personneSerivce->update($personnne, $personneUpdateDTO);
 
             $output->writeln('<info>Personne a été modifiée avec succès.</info>');
         } catch (EmailAlreadyTakenException $e) {

@@ -2,8 +2,8 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\PersonneCreateDTO;
-use App\Application\Service\PersonneFactory;
+use App\Application\DTO\CreerPersonneDTO;
+use App\Application\Service\PersonneService;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,14 +17,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class CreatePersonneCommand extends Command
+class PersonneCreerCommand extends Command
 {
-    protected static $defaultName = 'app:personnes:create';
+    protected static $defaultName = 'app:personne:creer';
 
     /**
-     * @var PersonneFactory
+     * @var PersonneService
      */
-    private $personneFactory;
+    private $personneService;
 
     /**
      * @var ValidatorInterface
@@ -32,14 +32,14 @@ class CreatePersonneCommand extends Command
     private $validator;
 
     /**
-     * @param PersonneFactory $personneFactory
+     * @param PersonneService $personneService
      * @param ValidatorInterface $validator
      */
-    public function __construct(PersonneFactory $personneFactory, ValidatorInterface $validator)
+    public function __construct(PersonneService $personneService, ValidatorInterface $validator)
     {
         parent::__construct();
 
-        $this->personneFactory = $personneFactory;
+        $this->personneService = $personneService;
         $this->validator = $validator;
     }
 
@@ -58,12 +58,13 @@ class CreatePersonneCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $personneCreteDTO = new PersonneCreateDTO();
-        $personneCreteDTO->email = $input->getArgument('email');
-        $personneCreteDTO->nom = $input->getArgument('nom');
+        // Construire DTO.
+        $creerPersonneDTO = new CreerPersonneDTO();
+        $creerPersonneDTO->email = $input->getArgument('email');
+        $creerPersonneDTO->nom = $input->getArgument('nom');
 
-        // Valider la saisie de l'utilisateur
-        $constraintViolationList = $this->validator->validate($personneCreteDTO);
+        // Valider la saisie de l'utilisateur.
+        $constraintViolationList = $this->validator->validate($creerPersonneDTO);
         if ($constraintViolationList->count() > 0) {
             foreach ($constraintViolationList as $violation) {
                 /** @var $violation ConstraintViolationInterface */
@@ -74,7 +75,8 @@ class CreatePersonneCommand extends Command
         }
 
         try {
-            $this->personneFactory->create($personneCreteDTO);
+            // Créer une personne.
+            $this->personneService->create($creerPersonneDTO);
 
             $output->writeln('<info>Personne a été créée avec succès.</info>');
         } catch (EmailAlreadyTakenException $e) {

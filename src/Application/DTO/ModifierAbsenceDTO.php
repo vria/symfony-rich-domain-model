@@ -18,8 +18,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class DeposerAbsenceDTO
+class ModifierAbsenceDTO
 {
+    /**
+     * Id d'une absence.
+     *
+     * @var string
+     */
+    private $id;
+
     /**
      * L'email d'une personne n'est pas modifiable lors du dépôt d'absence.
      *
@@ -50,29 +57,29 @@ class DeposerAbsenceDTO
 
     /**
      * @param string $email
-     */
-    public function __construct(string $email)
-    {
-        $this->email = $email;
-        $this->debut = new \DateTimeImmutable('tomorrow');
-        $this->fin = new \DateTimeImmutable('tomorrow');
-    }
-
-    /**
-     * @param string $email
      * @param Absence $absence
      *
      * @return static
      */
     public static function fromAbsence(string $email, Absence $absence)
     {
-        $dto = new static($email);
+        $dto = new self;
 
+        $dto->id = $absence->getId();
+        $dto->email = $email;
         $dto->debut = $absence->getDebut();
         $dto->fin = $absence->getFin();
-        $dto->type = $absence->getType();
+        $dto->type = $absence->getType()->getType();
 
         return $dto;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     /**

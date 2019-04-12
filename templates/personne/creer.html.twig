@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+
+{% block container_title %}
+    Ajouter une personne
+{% endblock %}
+
+
+{% block body %}
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.nom) }}
+        <div class="mt-3">
+            <a href="{{ path('personne_lister') }}" class="btn btn-default">
+                <i class="fas fa-arrow-left"></i> Annuler
+            </a>
+            {% block submit_button %}<button class="btn btn-primary">Ajouter</button>{% endblock %}
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

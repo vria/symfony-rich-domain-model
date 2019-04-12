@@ -13,9 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class ListPersonnesCommand extends Command
+class PersonnesListerCommand extends Command
 {
-    protected static $defaultName = 'app:personnes:list';
+    protected static $defaultName = 'app:personne:lister';
 
     /**
      * @var PersonneRepositoryInterface

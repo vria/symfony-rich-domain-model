@@ -19,6 +19,7 @@ class AbsenceType
 {
     const MALADIE = 1;      // Maladie
     const CONGES_PAYES = 2; // Congés payés
+    const TELETRAVAIL = 3;  // Télétravail
 
     /**
      * Type d'absence.
@@ -34,7 +35,7 @@ class AbsenceType
      */
     public function __construct(int $type)
     {
-        if (!in_array($type, [self::MALADIE, self::CONGES_PAYES])) {
+        if (!in_array($type, [self::MALADIE, self::CONGES_PAYES, self::TELETRAVAIL])) {
             throw new AbsenceTypeInvalidException("Type d'absence inconnu");
         }
 
@@ -62,6 +63,9 @@ class AbsenceType
 
             case AbsenceType::CONGES_PAYES:
                 return 'Congé payé';
+
+            case AbsenceType::TELETRAVAIL:
+                return 'Télétravail';
         }
 
         throw new \InvalidArgumentException;

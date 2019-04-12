@@ -1,0 +1,11 @@
+{% extends 'absence/deposer.html.twig' %}
+
+
+{% block container_title %}
+    Mettre à jour une absence pour {{ form.vars.value.email }}
+{% endblock %}
+
+
+{% block submit_button %}
+    <button class="btn btn-primary">Modifier</button>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'personne/creer.html.twig' %}
+
+
+{% block container_title %}
+    Modifier une personne {{ form.vars.value.email }}
+{% endblock %}
+
+
+{% block submit_button %}
+    <button class="btn btn-primary">Modifier</button>
+{% endblock %}

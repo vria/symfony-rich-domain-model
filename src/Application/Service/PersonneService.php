@@ -3,8 +3,8 @@
 namespace App\Application\Service;
 
 use App\Application\DTO\DeposerAbsenceDTO;
-use App\Application\DTO\PersonneCreateDTO;
-use App\Application\DTO\PersonneUpdateDTO;
+use App\Application\DTO\CreerPersonneDTO;
+use App\Application\DTO\ModifierAbsenceDTO;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceInvalidDatesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
@@ -21,7 +21,7 @@ use App\Domain\Repository\PersonneRepositoryInterface;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class PersonneFactory
+class PersonneService
 {
     /**
      * @var PersonneRepositoryInterface
@@ -45,11 +45,11 @@ class PersonneFactory
     /**
      * Ajouter une personne.
      *
-     * @param PersonneCreateDTO $personneCreateDTO
+     * @param CreerPersonneDTO $personneCreateDTO
      *
      * @throws EmailAlreadyTakenException
      */
-    public function create(PersonneCreateDTO $personneCreateDTO)
+    public function create(CreerPersonneDTO $personneCreateDTO)
     {
         $personne = new Personne($personneCreateDTO->email, $personneCreateDTO->nom, $this->personneRepository, $this->absenceRepository);
 
@@ -60,11 +60,11 @@ class PersonneFactory
      * Modifier les données d'une personne.
      *
      * @param Personne $personne
-     * @param PersonneUpdateDTO $personneUpdateDTO
+     * @param CreerPersonneDTO $personneUpdateDTO
      *
      * @throws EmailAlreadyTakenException
      */
-    public function update(Personne $personne, PersonneUpdateDTO $personneUpdateDTO)
+    public function update(Personne $personne, CreerPersonneDTO $personneUpdateDTO)
     {
         $personne->update($personneUpdateDTO->email, $personneUpdateDTO->nom);
 
@@ -87,6 +87,26 @@ class PersonneFactory
             $deposerAbsenceDTO->debut,
             $deposerAbsenceDTO->fin,
             $deposerAbsenceDTO->type
+        );
+
+        $this->personneRepository->save($personne);
+    }
+
+    /**
+     * @param Personne $personne
+     * @param ModifierAbsenceDTO $modifierAbsenceDTO
+     *
+     * @throws AbsenceAlreadyTakenException
+     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceTypeInvalidException
+     */
+    public function modifierAbsence(Personne $personne, ModifierAbsenceDTO $modifierAbsenceDTO)
+    {
+        $personne->modifierAbsence(
+            $modifierAbsenceDTO->getId(),
+            $modifierAbsenceDTO->debut,
+            $modifierAbsenceDTO->fin,
+            $modifierAbsenceDTO->type
         );
 
         $this->personneRepository->save($personne);
