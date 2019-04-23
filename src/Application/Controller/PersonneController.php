@@ -5,7 +5,7 @@ namespace App\Application\Controller;
 use App\Application\DTO\CreerPersonneDTO;
 use App\Application\Form\CreerPersonneType;
 use App\Application\Service\PersonneService;
-use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
@@ -66,7 +66,7 @@ class PersonneController
                 $personneFactory->create($creerPersonneDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_lister'));
-            } catch (EmailAlreadyTakenException $e) {
+            } catch (PersonneEmailAlreadyTakenException $e) {
                 $form->get('email')->addError(new FormError($e->getMessage()));
             }
         }

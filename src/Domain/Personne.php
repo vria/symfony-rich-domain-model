@@ -8,7 +8,7 @@ use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
 use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
-use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use App\Domain\Service\AbsenceCompteurService;
@@ -82,7 +82,7 @@ class Personne
     {
         // Vérifier que l'email n'est pas encore enregistré.
         if ($personneRepository->emailAlreadyExist($email)) {
-            throw new EmailAlreadyTakenException($email.' a été déjà enregistré');
+            throw new PersonneEmailAlreadyTakenException($email.' a été déjà enregistré');
         }
 
         $this->email = $email;

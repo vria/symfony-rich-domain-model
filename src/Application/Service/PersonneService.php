@@ -9,7 +9,7 @@ use App\Domain\Absence;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
-use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
@@ -49,7 +49,7 @@ class PersonneService
      *
      * @param CreerPersonneDTO $personneCreateDTO
      *
-     * @throws EmailAlreadyTakenException
+     * @throws PersonneEmailAlreadyTakenException
      */
     public function create(CreerPersonneDTO $personneCreateDTO)
     {

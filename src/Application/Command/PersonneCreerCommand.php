@@ -4,7 +4,7 @@ namespace App\Application\Command;
 
 use App\Application\DTO\CreerPersonneDTO;
 use App\Application\Service\PersonneService;
-use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -79,7 +79,7 @@ class PersonneCreerCommand extends Command
             $this->personneService->create($creerPersonneDTO);
 
             $output->writeln('<info>Personne a été créée avec succès.</info>');
-        } catch (EmailAlreadyTakenException $e) {
+        } catch (PersonneEmailAlreadyTakenException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }

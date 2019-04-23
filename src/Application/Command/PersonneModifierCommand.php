@@ -4,7 +4,7 @@ namespace App\Application\Command;
 
 use App\Application\DTO\CreerPersonneDTO;
 use App\Application\Service\PersonneService;
-use App\Domain\Exception\EmailAlreadyTakenException;
+use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
@@ -104,7 +104,7 @@ class PersonneModifierCommand extends Command
             $this->personneSerivce->update($personnne, $personneUpdateDTO);
 
             $output->writeln('<info>Personne a été modifiée avec succès.</info>');
-        } catch (EmailAlreadyTakenException $e) {
+        } catch (PersonneEmailAlreadyTakenException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }

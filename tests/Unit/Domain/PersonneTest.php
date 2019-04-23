@@ -31,7 +31,7 @@ class PersonneTest extends TestCase
     /**
      * Le constructeur de @see Personne lève une exception si l'email est déjà pris.
      *
-     * @expectedException \App\Domain\Exception\EmailAlreadyTakenException
+     * @expectedException \App\Domain\Exception\PersonneEmailAlreadyTakenException
      */
     public function testThrowsEmailAlreadyTakenException()
     {

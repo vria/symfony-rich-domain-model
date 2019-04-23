@@ -23,6 +23,7 @@
         "symfony/orm-pack": "^1.0",
         "symfony/profiler-pack": "^1.0",
         "symfony/proxy-manager-bridge": "4.2.*",
+        "symfony/translation": "4.2.*",
         "symfony/twig-bundle": "*",
         "symfony/validator": "*",
         "symfony/yaml": "*"
