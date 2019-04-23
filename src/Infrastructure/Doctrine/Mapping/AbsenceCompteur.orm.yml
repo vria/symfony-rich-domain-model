@@ -1,4 +1,4 @@
-App\Domain\Absence:
+App\Domain\AbsenceCompteur:
   type: entity
 
   id:
@@ -12,10 +12,10 @@ App\Domain\Absence:
       class: App\Domain\AbsenceType
 
   fields:
-    debut:
-      type: datetime_immutable
-    fin:
-      type: datetime_immutable
+    joursDisponibles:
+      type: integer
+    joursTravailles:
+      type: integer
 
   manyToOne:
     personne:

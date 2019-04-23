@@ -26,6 +26,7 @@ class CreerPersonneType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
+                'disabled' => $options['edit']
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
@@ -38,8 +39,9 @@ class CreerPersonneType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        return [
+        $resolver->setDefaults([
             'data_class' => CreerPersonneDTO::class,
-        ];
+            'edit' => false,
+        ]);
     }
 }

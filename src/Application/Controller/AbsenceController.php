@@ -7,7 +7,8 @@ use App\Application\DTO\ModifierAbsenceDTO;
 use App\Application\Form\DeposerAbsenceType;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
-use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceDatesInvalidesException;
+use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
 use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
@@ -91,9 +92,7 @@ class AbsenceController
                 $personneService->deposerAbsence($personne, $deposerAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceInvalidDatesException $e) {
-                $form->addError(new FormError($e->getMessage()));
-            } catch (AbsenceAlreadyTakenException $e) {
+            } catch (AbsenceDatesInvalidesException|AbsenceAlreadyTakenException|AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -135,9 +134,7 @@ class AbsenceController
                 $personneFactory->modifierAbsence($personne, $modifierAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceInvalidDatesException $e) {
-                $form->addError(new FormError($e->getMessage()));
-            } catch (AbsenceAlreadyTakenException $e) {
+            } catch (AbsenceDatesInvalidesException|AbsenceAlreadyTakenException|AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -169,5 +166,28 @@ class AbsenceController
         $personne->annulerAbsence($absence);
 
         return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
+    }
+
+    /**
+     * @Route("/compteurs/jours_disponibles/{email}", name="personne_compteurs_jours_disponibles")
+     * @Template()
+     *
+     * @param string $email
+     * @param PersonneRepositoryInterface $personneRepository
+     *
+     * @return array|RedirectResponse
+     */
+    public function compteurs(string $email, PersonneRepositoryInterface $personneRepository)
+    {
+        try {
+            $personne = $personneRepository->get($email);
+        } catch (PersonneNotFoundException $e) {
+            throw new NotFoundHttpException();
+        }
+
+        return [
+            'personne' => $personne,
+            'compteurs' => $personne->getCompteursInfo(),
+        ];
     }
 }

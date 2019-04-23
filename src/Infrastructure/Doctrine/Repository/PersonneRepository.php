@@ -2,13 +2,14 @@
 
 namespace App\Infrastructure\Doctrine\Repository;
 
-use App\Domain\Absence;
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\NoResultException;
 
 /**
@@ -17,26 +18,23 @@ use Doctrine\ORM\NoResultException;
 class PersonneRepository extends ServiceEntityRepository implements PersonneRepositoryInterface
 {
     /**
-     * @var AbsenceRepositoryInterface
-     */
-    private $absenceRepository;
-
-    /**
      * @inheritdoc
      */
-    public function __construct(ManagerRegistry $registry, AbsenceRepositoryInterface $absenceRepository)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Personne::class);
-
-        $this->absenceRepository = $absenceRepository;
     }
 
     /**
      * @inheritdoc
      */
-    public function getAll(): array
+    public function getAllInfo(): array
     {
-        return $this->findAll();
+        return $this->createQueryBuilder('p')
+            ->select('p.email, p.nom')
+            ->orderBy('p.email', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     /**
@@ -48,14 +46,6 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
         if (!$personne instanceof Personne) {
             throw new PersonneNotFoundException('Personne '.$email." n'est pas trouvée");
         }
-
-        $personneRepositoryReflProp = (new \ReflectionClass(Personne::class))->getProperty('personneRepository');
-        $personneRepositoryReflProp->setAccessible(true);
-        $personneRepositoryReflProp->setValue($personne, $this);
-
-        $personneRepositoryReflProp = (new \ReflectionClass(Personne::class))->getProperty('absenceRepository');
-        $personneRepositoryReflProp->setAccessible(true);
-        $personneRepositoryReflProp->setValue($personne, $this->absenceRepository);
 
         return $personne;
     }

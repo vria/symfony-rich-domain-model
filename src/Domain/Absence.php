@@ -2,7 +2,8 @@
 
 namespace App\Domain;
 
-use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceDatesDansLePasseException;
+use App\Domain\Exception\AbsenceDatesInvalidesException;
 
 /**
  * Une absence déposée.
@@ -13,7 +14,7 @@ use App\Domain\Exception\AbsenceInvalidDatesException;
 class Absence
 {
     /**
-     * Identité d'une absence qui est autogénérée.
+     * Identité d'une absence autogénérée.
      *
      * @var int
      */
@@ -56,7 +57,7 @@ class Absence
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      *
      * @throws
      */
@@ -75,7 +76,7 @@ class Absence
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      */
     public function modify(int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
@@ -138,12 +139,17 @@ class Absence
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      */
     private function setDates(\DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
         if ($debut > $fin) {
-            throw new AbsenceInvalidDatesException('Date de fin doit être après la date de début');
+            throw new AbsenceDatesInvalidesException('Date de fin doit être après la date de début');
+        }
+
+        $today = (\DateTime::createFromFormat('U', time()))->setTime(0, 0, 0);
+        if ($debut < $today) {
+            throw new AbsenceDatesDansLePasseException('Le début de l\'absence doit être dans le futur');
         }
 
         $this->debut = $debut;

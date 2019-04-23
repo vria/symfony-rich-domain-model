@@ -3,13 +3,10 @@
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Domain\Absence;
-use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 
 /**
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
@@ -39,27 +36,41 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
     /**
      * @inheritdoc
      */
-    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool
+    public function absenceDeposeDansPeriode(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool
     {
-        try {
-            $qb = $this->createQueryBuilder('a')
-                ->select('COUNT(a)')
-                ->andWhere('a.personne = :personne')
-                ->andWhere('a.debut <= :fin')
-                ->andWhere('a.fin >= :debut')
-                ->setParameter('debut', $debut)
-                ->setParameter('fin', $fin)
-                ->setParameter('personne', $personne);
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a)')
+            ->andWhere('a.personne = :personne')
+            ->andWhere('a.debut <= :fin')
+            ->andWhere(':debut <= a.fin')
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->setParameter('personne', $personne);
 
-            if ($exclude) {
-                $qb->andWhere('a != :exclude')
-                    ->setParameter('exclude', $exclude);
-            }
-
-            return $qb->getQuery()->getSingleScalarResult() > 0;
-        } catch (NoResultException $e) {
-            return false;
+        if ($exclude) {
+            $qb->andWhere('a != :exclude')
+                ->setParameter('exclude', $exclude);
         }
+
+        return $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function absenceDeposePourDate(Personne $personne, \DateTimeImmutable $date, array $types)
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a)')
+            ->andWhere('a.personne = :personne')
+            ->andWhere('a.debut <= :date')
+            ->andWhere(':date <= a.fin')
+            ->andWhere('a.type in (:types)')
+            ->setParameter('personne', $personne)
+            ->setParameter('debut', $date)
+            ->setParameter('types', $types);
+
+        return intval($qb->getQuery()->getSingleScalarResult()) > 0;
     }
 
     /**
@@ -67,17 +78,13 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
      */
     public function getAbsence(Personne $personne, $id)
     {
-        try {
-            return $this->createQuerybuilder('a')
-                ->andWhere('a.id = :id')
-                ->andWhere('a.personne = :personne')
-                ->setParameter('id', $id)
-                ->setParameter('personne', $personne)
-                ->getQuery()
-                ->getSingleResult();
-        } catch (NoResultException $e) {
-            throw new AbsenceNotFoundException();
-        }
+        return $this->createQuerybuilder('a')
+            ->andWhere('a.id = :id')
+            ->andWhere('a.personne = :personne')
+            ->setParameter('id', $id)
+            ->setParameter('personne', $personne)
+            ->getQuery()
+            ->getSingleResult();
     }
 
     /**

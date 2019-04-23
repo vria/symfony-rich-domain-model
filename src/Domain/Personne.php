@@ -2,13 +2,16 @@
 
 namespace App\Domain;
 
+use App\Domain\DTO\CompteurInfoDTO;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
-use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceDatesInvalidesException;
+use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
 use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
+use App\Domain\Service\AbsenceCompteurService;
 
 /**
  * Une personne.
@@ -46,7 +49,7 @@ class Personne
     /**
      * Tableu des compteurs d'absence.
      *
-     * @var CompteurAbsence[]
+     * @var AbsenceCompteur[]
      */
     private $compteursAbsence;
 
@@ -64,12 +67,18 @@ class Personne
     private $absenceRepository;
 
     /**
+     * @var AbsenceCompteurService
+     */
+    private $absenceCompteurService;
+
+    /**
      * @param string $email
      * @param string $nom
      * @param PersonneRepositoryInterface $personneRepository
      * @param AbsenceRepositoryInterface $absenceRepository
+     * @param AbsenceCompteurService $absenceCompteurService
      */
-    public function __construct(string $email, string $nom, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
+    public function __construct(string $email, string $nom, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository, AbsenceCompteurService $absenceCompteurService)
     {
         // Vérifier que l'email n'est pas encore enregistré.
         if ($personneRepository->emailAlreadyExist($email)) {
@@ -78,8 +87,10 @@ class Personne
 
         $this->email = $email;
         $this->nom = $nom;
+        $this->compteursAbsence = $absenceCompteurService->init($this);
         $this->personneRepository = $personneRepository;
         $this->absenceRepository = $absenceRepository;
+        $this->absenceCompteurService = $absenceCompteurService;
     }
 
     /**
@@ -101,16 +112,10 @@ class Personne
     /**
      * Modifier les données d'une personne.
      *
-     * @param string $email
      * @param string $nom
      */
-    public function update(string $email, string $nom)
+    public function update(string $nom)
     {
-        if ($email !== $this->email && $this->personneRepository->emailAlreadyExist($email)) {
-            throw new EmailAlreadyTakenException($email.' a été déjà enregistré');
-        }
-
-        $this->email = $email;
         $this->nom = $nom;
     }
 
@@ -118,22 +123,26 @@ class Personne
      * Déposer une absence.
      * Il n'est pas possible de déposer une absence qui chevauche une absence déjà existante.
      *
+     * @param int $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
-     * @param int $type
      *
      * @throws AbsenceAlreadyTakenException
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
+     * @throws AbsenceJoursDisponiblesInsuffisantsException
      */
-    public function deposerAbsence(\DateTimeImmutable $debut, \DateTimeImmutable $fin, int $type)
+    public function deposerAbsence(int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
-        if ($this->absenceRepository->absenceAlreadyExist($this, $debut, $fin)) {
+        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $debut, $fin)) {
             throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
         }
 
         $absence = new Absence($this, $type, $debut, $fin);
+        $this->absenceCompteurService->deposerAbsence($this->compteursAbsence, new AbsenceType($type), $debut, $fin);
+
         $this->absenceRepository->save($absence);
+        $this->personneRepository->save($this);
     }
 
     /**
@@ -143,17 +152,24 @@ class Personne
      * @param int $type
      *
      * @throws AbsenceAlreadyTakenException
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
+     * @throws AbsenceNotFoundException
+     * @throws AbsenceJoursDisponiblesInsuffisantsException
      */
     public function modifierAbsence($id, \DateTimeImmutable $debut, \DateTimeImmutable $fin, int $type)
     {
-        if ($this->absenceRepository->absenceAlreadyExist($this, $debut, $fin, $id)) {
+        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $debut, $fin, $id)) {
             throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
         }
 
         $absence = $this->absenceRepository->getAbsence($this, $id);
+        $this->absenceCompteurService->modifierAbsence($this->compteursAbsence, $absence, $absence->getType(), $debut, $fin);
+
         $absence->modify($type, $debut, $fin);
+
+        $this->absenceRepository->save($absence);
+        $this->personneRepository->save($this);
     }
 
     /**
@@ -162,6 +178,7 @@ class Personne
     public function annulerAbsence(Absence $absence)
     {
         $this->absenceRepository->annuler($absence);
+        $this->absenceCompteurService->annulerAbsence($this->compteursAbsence, $absence);
     }
 
     /**
@@ -185,5 +202,23 @@ class Personne
     public function getAbsence($id)
     {
         return $this->absenceRepository->getAbsence($this, $id);
+    }
+
+    /**
+     * @var \DateTimeImmutable $date
+     *
+     * Incrémenter les jours travailles dans les compteurs concernés.
+     */
+    public function incrementerJoursTravailles(\DateTimeImmutable $date)
+    {
+        $this->absenceCompteurService->incrementerJoursTravailles($this->compteursAbsence, $this, $date);
+    }
+
+    /**
+     * @return CompteurInfoDTO[]
+     */
+    public function getCompteursInfo()
+    {
+        return $this->absenceCompteurService->getCompteurInfoDTO($this->compteursAbsence);
     }
 }

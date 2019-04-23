@@ -15,9 +15,9 @@ interface PersonneRepositoryInterface
     /**
      * Récupérer toutes les personnes.
      *
-     * @return Personne[]
+     * @return array[]
      */
-    public function getAll(): array;
+    public function getAllInfo(): array;
 
     /**
      * Récupérer une personne par son identifiant (email).

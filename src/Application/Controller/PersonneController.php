@@ -38,7 +38,7 @@ class PersonneController
     public function lister(PersonneRepositoryInterface $personneRepository)
     {
         return [
-            'personnes' => $personneRepository->getAll()
+            'personnes' => $personneRepository->getAllInfo()
         ];
     }
 
@@ -99,17 +99,15 @@ class PersonneController
         }
 
         $modifierPersonneDTO = CreerPersonneDTO::fromPerson($personne);
-        $form = $formFactory->create(CreerPersonneType::class, $modifierPersonneDTO);
+        $form = $formFactory->create(CreerPersonneType::class, $modifierPersonneDTO, [
+            'edit' => true,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $personneFactory->update($personne, $modifierPersonneDTO);
+            $personneFactory->update($personne, $modifierPersonneDTO);
 
-                return new RedirectResponse($urlGenerator->generate('personne_lister'));
-            } catch (EmailAlreadyTakenException $e) {
-                $form->get('email')->addError(new FormError($e->getMessage()));
-            }
+            return new RedirectResponse($urlGenerator->generate('personne_lister'));
         }
 
         return [

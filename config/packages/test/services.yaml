@@ -1,0 +1,3 @@
+services:
+    App\Tests\Fixtures\AppFixtures:
+        tags: ['doctrine.fixture.orm']

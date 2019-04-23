@@ -29,5 +29,15 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Infrastructure\Doctrine\Listener\PersonneLifecycleListener:
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
+    App\Infrastructure\Doctrine\Repository\PersonneRepository:
+        lazy: true
+
+    App\Infrastructure\Doctrine\Repository\AbsenceRepository:
+        lazy: true
+
     App\Domain\Repository\PersonneRepositoryInterface: '@App\Infrastructure\Doctrine\Repository\PersonneRepository'
     App\Domain\Repository\AbsenceRepositoryInterface: '@App\Infrastructure\Doctrine\Repository\AbsenceRepository'

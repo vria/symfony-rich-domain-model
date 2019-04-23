@@ -1,8 +1,16 @@
 App\Domain\Personne:
   type: entity
+
   id:
     email:
       type: string
+
   fields:
     nom:
       type: string
+
+  oneToMany:
+    compteursAbsence:
+      targetEntity: App\Domain\AbsenceCompteur
+      mappedBy: personne
+      cascade: ["persist"]

@@ -45,7 +45,7 @@ class PersonnesListerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $personnes = $this->personneRepository->getAll();
+        $personnes = $this->personneRepository->getAllInfo();
 
         $table = new Table($output);
         $table->setHeaders(['Email', 'Nom']);

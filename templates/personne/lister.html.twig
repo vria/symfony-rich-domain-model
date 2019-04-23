@@ -31,6 +31,9 @@
                     <a href="{{ path('personne_absence_calendrier', {email: personne.email}) }}" class="btn btn-default btn-sm">
                         <i class="far fa-calendar-check"></i> Calendrier
                     </a>
+                    <a href="{{ path('personne_compteurs_jours_disponibles', {email: personne.email}) }}" class="btn btn-default btn-sm">
+                        <i class="fas fa-list-ol"></i> Compteurs
+                    </a>
                 </td>
             </tr>
         {% endfor %}

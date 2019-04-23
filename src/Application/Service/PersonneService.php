@@ -5,13 +5,15 @@ namespace App\Application\Service;
 use App\Application\DTO\DeposerAbsenceDTO;
 use App\Application\DTO\CreerPersonneDTO;
 use App\Application\DTO\ModifierAbsenceDTO;
+use App\Domain\Absence;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
-use App\Domain\Exception\AbsenceInvalidDatesException;
+use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
 use App\Domain\Exception\EmailAlreadyTakenException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
+use App\Domain\Service\AbsenceCompteurService;
 
 /**
  * Un service qui traite les actions liées aux objets @see Personne.
@@ -51,7 +53,13 @@ class PersonneService
      */
     public function create(CreerPersonneDTO $personneCreateDTO)
     {
-        $personne = new Personne($personneCreateDTO->email, $personneCreateDTO->nom, $this->personneRepository, $this->absenceRepository);
+        $personne = new Personne(
+            $personneCreateDTO->email,
+            $personneCreateDTO->nom,
+            $this->personneRepository,
+            $this->absenceRepository,
+            new AbsenceCompteurService($this->absenceRepository)
+        );
 
         $this->personneRepository->save($personne);
     }
@@ -61,12 +69,10 @@ class PersonneService
      *
      * @param Personne $personne
      * @param CreerPersonneDTO $personneUpdateDTO
-     *
-     * @throws EmailAlreadyTakenException
      */
     public function update(Personne $personne, CreerPersonneDTO $personneUpdateDTO)
     {
-        $personne->update($personneUpdateDTO->email, $personneUpdateDTO->nom);
+        $personne->update($personneUpdateDTO->nom);
 
         $this->personneRepository->save($personne);
     }
@@ -78,15 +84,15 @@ class PersonneService
      * @param DeposerAbsenceDTO $deposerAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
      */
     public function deposerAbsence(Personne $personne, DeposerAbsenceDTO $deposerAbsenceDTO)
     {
         $personne->deposerAbsence(
+            $deposerAbsenceDTO->type,
             $deposerAbsenceDTO->debut,
-            $deposerAbsenceDTO->fin,
-            $deposerAbsenceDTO->type
+            $deposerAbsenceDTO->fin
         );
 
         $this->personneRepository->save($personne);
@@ -97,7 +103,7 @@ class PersonneService
      * @param ModifierAbsenceDTO $modifierAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException
-     * @throws AbsenceInvalidDatesException
+     * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
      */
     public function modifierAbsence(Personne $personne, ModifierAbsenceDTO $modifierAbsenceDTO)
@@ -108,7 +114,5 @@ class PersonneService
             $modifierAbsenceDTO->fin,
             $modifierAbsenceDTO->type
         );
-
-        $this->personneRepository->save($personne);
     }
 }

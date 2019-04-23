@@ -33,7 +33,16 @@ interface AbsenceRepositoryInterface
      *
      * @return bool
      */
-    public function absenceAlreadyExist(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool;
+    public function absenceDeposeDansPeriode(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool;
+
+    /**
+     * @param Personne $personne
+     * @param \DateTimeImmutable $date
+     * @param array $types
+     *
+     * @return bool
+     */
+    public function absenceDeposePourDate(Personne $personne, \DateTimeImmutable $date, array $types);
 
     /**
      * @param Personne $personne

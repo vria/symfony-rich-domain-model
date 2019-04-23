@@ -7,6 +7,6 @@ namespace App\Domain\Exception;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class AbsenceInvalidDatesException extends \InvalidArgumentException
+class AbsenceDatesInvalidesException extends \InvalidArgumentException
 {
 }

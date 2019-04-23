@@ -60,10 +60,8 @@ class AbsenceType
         switch ($type) {
             case AbsenceType::MALADIE:
                 return 'Maladie';
-
             case AbsenceType::CONGES_PAYES:
                 return 'Congé payé';
-
             case AbsenceType::TELETRAVAIL:
                 return 'Télétravail';
         }

@@ -12,6 +12,8 @@ install:
   - composer install
 
 script:
+  - php bin/console doctrine:database:create --env=test
+  - php bin/console doctrine:fixtures:load --env=test --no-interaction
   - vendor/bin/phpunit --coverage-clover=coverage.xml
 
 after_success:

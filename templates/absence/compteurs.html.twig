@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+
+{% block container_title %}
+    Compteurs de {{ personne.nom }}
+{% endblock %}
+
+
+{% block body %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Compteur</th>
+            <th>Jours restants</th>
+            <th>Progression</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in compteurs %}
+            <tr>
+                <td>{{ c.compteur }}</td>
+                <td>{{ c.joursDisponibles }}</td>
+                <td>
+                    <div class="progress position-relative">
+                        <div class="progress-bar bg-warning" style="width: {{ c.joursTravailles * 100 / c.periodeIncrementer }}%"></div>
+                        <div class="text-center w-100 position-absolute ">
+                            {{ c.joursTravailles }} / {{ c.periodeIncrementer }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        <a href="{{ path('personne_lister') }}" class="btn btn-default">
+            <i class="fas fa-arrow-left"></i> Revenir à la liste
+        </a>
+    </div>
+{% endblock %}

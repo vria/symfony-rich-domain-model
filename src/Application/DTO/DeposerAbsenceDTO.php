@@ -28,6 +28,13 @@ class DeposerAbsenceDTO
     private $email;
 
     /**
+     * @var int
+     *
+     * @Assert\NotNull()
+     */
+    public $type;
+
+    /**
      * @var \DateTimeImmutable
      *
      * @Assert\NotNull()
@@ -40,13 +47,6 @@ class DeposerAbsenceDTO
      * @Assert\NotNull()
      */
     public $fin;
-
-    /**
-     * @var int
-     *
-     * @Assert\NotNull()
-     */
-    public $type;
 
     /**
      * @param string $email
@@ -68,9 +68,9 @@ class DeposerAbsenceDTO
     {
         $dto = new static($email);
 
+        $dto->type = $absence->getType();
         $dto->debut = $absence->getDebut();
         $dto->fin = $absence->getFin();
-        $dto->type = $absence->getType();
 
         return $dto;
     }

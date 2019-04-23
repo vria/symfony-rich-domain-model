@@ -6,18 +6,30 @@ use App\Domain\Absence;
 use App\Domain\AbsenceType;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
+use App\Domain\Service\AbsenceCompteurService;
 use App\Infrastructure\Doctrine\Repository\AbsenceRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 /**
  * Unit test case of @see Personne class.
  *
- * @author Vlad Riabchenko <vriabchenko@laposte.fr>
+ * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class PersonneTest extends TestCase
 {
     /**
-     * @see Personne constructor throws an exception if email is already taken.
+     * @inheritdoc
+     */
+    public static function setUpBeforeClass()
+    {
+        // Fixer la date 25/04/2019 pour la classe Absence.
+        ClockMock::register(Absence::class);
+        ClockMock::withClockMock(strtotime("2019-04-25 15:00:00"));
+    }
+
+    /**
+     * Le constructeur de @see Personne lève une exception si l'email est déjà pris.
      *
      * @expectedException \App\Domain\Exception\EmailAlreadyTakenException
      */
@@ -26,110 +38,64 @@ class PersonneTest extends TestCase
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(true);
         $absenceRepository = $this->createMock(AbsenceRepository::class);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-        new Personne('', '', $personneRepository, $absenceRepository);
+        new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
     }
 
     /**
-     * @see Personne::getEmail() returns the email initialized in @see Personne::__constructor().
+     * @see Personne::getEmail() renvoie l'email initialisé dans
+     * @see Personne::__construct().
      */
     public function testReturnsEmail()
     {
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(false);
         $absenceRepository = $this->createMock(AbsenceRepository::class);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-        $personne = new Personne('rick.sanchez@laposte.fr', '', $personneRepository, $absenceRepository);
+        $personne = new Personne('rick.sanchez@webnet.fr', '', $personneRepository, $absenceRepository, $absenceCompteurService);
 
-        $this->assertEquals('rick.sanchez@laposte.fr', $personne->getEmail());
+        $this->assertEquals('rick.sanchez@webnet.fr', $personne->getEmail());
     }
 
     /**
-     * @see Personne::getNom() returns the email initialized in @see Personne::__constructor().
+     * @see Personne::getNom() renvoie le nom initialisé dans
+     * @see Personne::__construct().
      */
     public function testReturnsNom()
     {
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(false);
         $absenceRepository = $this->createMock(AbsenceRepository::class);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-        $personne = new Personne('', 'Sanchez', $personneRepository, $absenceRepository);
+        $personne = new Personne('', 'Sanchez', $personneRepository, $absenceRepository, $absenceCompteurService);
 
         $this->assertEquals('Sanchez', $personne->getNom());
     }
 
     /**
-     * @see Personne::update() throws no exception when the email passed to it
-     * equals the email already initialized in @see Personne::$email
-     * even if @see PersonneRepositoryInterface::emailAlreadyExist() returns `true`.
-     */
-    public function testUpdateThrowsNoEmailAlreadyTakenExceptionOnSameEmail()
-    {
-        $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
-        $personneRepository->method('emailAlreadyExist')->willReturnOnConsecutiveCalls(false, true);
-        $absenceRepository = $this->createMock(AbsenceRepository::class);
-
-        $personne = new Personne('rick.sanchez@laposte.fr', '', $personneRepository, $absenceRepository);
-        $personne->update('rick.sanchez@laposte.fr', '');
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @see Personne::update() throws an exception when the email passed to it
-     * is already taken according to @see PersonneRepositoryInterface::emailAlreadyExist().
-     * Email passed to @see Personne::update() must differ from the email already
-     * initialized in @see Personne::$email.
-     *
-     * @expectedException \App\Domain\Exception\EmailAlreadyTakenException
-     */
-    public function testUpdateThrowsEmailAlreadyTakenException()
-    {
-        $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
-        $personneRepository->method('emailAlreadyExist')->willReturnOnConsecutiveCalls(false, true);
-        $absenceRepository = $this->createMock(AbsenceRepository::class);
-
-        $personne = new Personne('rick.sanchez@laposte.fr', '', $personneRepository, $absenceRepository);
-        $personne->update('morty.smith@laposte.fr', '');
-    }
-
-    /**
-     * @see Personne::update() updates @see Personne::$email.
-     *
-     * @author Vlad Riabchenko <vriabchenko@laposte.fr>
-     */
-    public function testUpdatesEmail()
-    {
-        $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
-        $personneRepository->method('emailAlreadyExist')->willReturnOnConsecutiveCalls(false, false);
-        $absenceRepository = $this->createMock(AbsenceRepository::class);
-
-        $personne = new Personne('rick.sanchez@laposte.fr', '', $personneRepository, $absenceRepository);
-        $personne->update('rsanchez@laposte.fr', '');
-
-        $this->assertEquals('rsanchez@laposte.fr', $personne->getEmail());
-    }
-
-    /**
-     * @see Personne::update() updates @see Personne::$nom.
-     *
-     * @author Vlad Riabchenko <vriabchenko@laposte.fr>
+     * @see Personne::update() modifie
+     * @see Personne::$nom.
      */
     public function testUpdatesNom()
     {
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturnOnConsecutiveCalls(false, false);
         $absenceRepository = $this->createMock(AbsenceRepository::class);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-        $personne = new Personne('rick.sanchez@laposte.fr', 'Rick', $personneRepository, $absenceRepository);
-        $personne->update('rick.sanchez@laposte.fr', 'Richard');
+        $personne = new Personne('', 'Rick', $personneRepository, $absenceRepository, $absenceCompteurService);
+        $personne->update('Richard');
 
         $this->assertEquals('Richard', $personne->getNom());
     }
 
     /**
-     * @see Personne::deposerAbsence() throws an exeption if absence already exists
-     * for given dates according to @see AbsenceRepository::absenceAlreadyExist().
+     * @see Personne::deposerAbsence() jette une exception si une absence existe
+     * déjà pour des dates passées selon
+     * @see AbsenceRepository::absenceDeposeDansPeriode().
      *
      * @expectedException \App\Domain\Exception\AbsenceAlreadyTakenException
      */
@@ -137,40 +103,64 @@ class PersonneTest extends TestCase
     {
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(false);
-
         $absenceRepository = $this->createMock(AbsenceRepository::class);
-        $absenceRepository->method('absenceAlreadyExist')->willReturn(true);
+        $absenceRepository->method('absenceDeposeDansPeriode')->willReturn(true);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-        $personne = new Personne('', '', $personneRepository, $absenceRepository);
-        $personne->deposerAbsence(new \DateTimeImmutable(), new \DateTimeImmutable(), AbsenceType::MALADIE);
+        $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
+        $personne->deposerAbsence(AbsenceType::MALADIE, new \DateTimeImmutable(), new \DateTimeImmutable());
     }
 
     /**
-     * @see Personne::deposerAbsence() creates a new @see Absence.
+     * @see Personne::deposerAbsence() et
+     * @see Absence::__construct() jetent une exeption si les dates d'absence
+     * sont dans le passé.
+     *
+     * @expectedException \App\Domain\Exception\AbsenceDatesDansLePasseException
+     */
+    public function testDeposerAbsenceDansLePasseThrowsAbsenceDatesInvalidesException()
+    {
+        $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
+        $personneRepository->method('emailAlreadyExist')->willReturn(false);
+        $absenceRepository = $this->createMock(AbsenceRepository::class);
+        $absenceRepository->method('absenceDeposeDansPeriode')->willReturn(false);
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
+
+        $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
+
+        $dateAbsence = new \DateTimeImmutable('2019-04-24 15:00:00');
+        $personne->deposerAbsence(AbsenceType::MALADIE, $dateAbsence, $dateAbsence);
+    }
+
+    /**
+     * @see Personne::deposerAbsence() crée un nouvelle objet de classe
+     * @see Absence.
      */
     public function testDeposerAbsenceIsAdded()
     {
         $testCase = $this;
-        $debut = new \DateTimeImmutable();
-        $fin = new \DateTimeImmutable();
+        $debut = new \DateTimeImmutable('2019-04-27');
+        $fin = new \DateTimeImmutable('2019-04-28');
 
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(false);
-
         $absenceRepository = $this->createMock(AbsenceRepository::class);
-        $absenceRepository->method('absenceAlreadyExist')->willReturn(false);
+        $absenceRepository->method('absenceDeposeDansPeriode')->willReturn(false);
+        $absenceRepository
+            ->expects($this->once())
+            ->method('save')
+            ->will($this->returnCallback(function($absence) use ($testCase, $debut, $fin) {
+                /** @var $absence Absence */
 
-        $absenceRepository->expects($this->once())->method('save')->will($this->returnCallback(function($absence) use ($testCase, $debut, $fin) {
-            /** @var $absence Absence */
+                $testCase->assertInstanceOf(Absence::class, $absence);
+                $testCase->assertInstanceOf(AbsenceType::class, $absence->getType());
+                $testCase->assertEquals(AbsenceType::MALADIE, $absence->getType()->getType());
+                $testCase->assertEquals($debut, $absence->getDebut());
+                $testCase->assertEquals($fin, $absence->getFin());
+            }));
+        $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
-            $testCase->assertInstanceOf(Absence::class, $absence);
-            $testCase->assertInstanceOf(AbsenceType::class, $absence->getType());
-            $testCase->assertEquals(AbsenceType::MALADIE, $absence->getType()->getType());
-            $testCase->assertEquals($debut, $absence->getDebut());
-            $testCase->assertEquals($fin, $absence->getFin());
-        }));
-
-        $personne = new Personne('', '', $personneRepository, $absenceRepository);
-        $personne->deposerAbsence($debut, $fin, AbsenceType::MALADIE);
+        $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
+        $personne->deposerAbsence(AbsenceType::MALADIE, $debut, $fin);
     }
 }
