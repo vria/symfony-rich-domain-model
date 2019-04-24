@@ -147,7 +147,7 @@ class Absence
             throw new AbsenceDatesInvalidesException('Date de fin doit être après la date de début');
         }
 
-        $today = (\DateTime::createFromFormat('U', time()))->setTime(0, 0, 0);
+        $today = (\DateTimeImmutable::createFromFormat('U', time()))->setTime(0, 0, 0);
         if ($debut < $today) {
             throw new AbsenceDatesDansLePasseException('Le début de l\'absence doit être dans le futur');
         }

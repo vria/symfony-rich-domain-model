@@ -8,7 +8,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * @see AbsenceControllerTest
+ * @see AbsenceController
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
@@ -20,6 +20,7 @@ class AbsenceControllerTest extends WebTestCase
     public static function setUpBeforeClass()/* The :void return type declaration that should be here would cause a BC issue */
     {
         ClockMock::register(Absence::class);
+        ClockMock::register(AbsenceController::class);
         ClockMock::withClockMock(strtotime("2019-04-25 15:00:00"));
     }
 

@@ -50,7 +50,12 @@ class AbsenceController
             throw new NotFoundHttpException();
         }
 
-        $startPeriod = (new \DateTimeImmutable($startPeriod ?? 'today'))->modify('monday this week');
+        if ($startPeriod) {
+            $startPeriod = new \DateTimeImmutable($startPeriod);
+        } else {
+            $startPeriod = (\DateTimeImmutable::createFromFormat('U', time()))->modify('monday this week');
+        }
+
         $endPeriod = $startPeriod->modify('sunday this week');
 
         return [
