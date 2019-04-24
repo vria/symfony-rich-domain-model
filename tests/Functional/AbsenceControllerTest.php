@@ -152,16 +152,10 @@ class AbsenceControllerTest extends WebTestCase
     /**
      * @see AbsenceController::deposer()
      */
-    public function testDeposerNoCounterCheck()
+    public function testDeposer()
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
-
-        $this->assertCount(
-            1,
-            $crawler->filter('h3:contains("Deposer une absence pour rsanchez@webnet.fr")'),
-            ''
-        );
 
         $this->assertCount(
             1,
@@ -176,6 +170,15 @@ class AbsenceControllerTest extends WebTestCase
         $finInput = $crawler->filter('input[name="deposer_absence[fin]"]');
         $this->assertCount(1, $finInput, '');
         $this->assertEquals('2019-04-25', $finInput->attr('value'), 'Le champ "Fin" contient la date de demain par défaut');
+    }
+
+    /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerNoCounterCheck()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
 
         $form = $crawler->selectButton('Déposer')->form([
             'deposer_absence[debut]' => '2019-04-26',
@@ -211,6 +214,124 @@ class AbsenceControllerTest extends WebTestCase
             $absence->filter('a .fa-trash'),
             'Lien d\'annulation du congé est présente'
         );
+    }
+
+    /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerDatesInvalides()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
+
+        $form = $crawler->selectButton('Déposer')->form([
+            'deposer_absence[debut]' => '2019-04-26',
+            'deposer_absence[fin]' => '2019-04-25',
+            'deposer_absence[type]' => '1',
+        ]);
+
+        $crawler = $client->submit($form);
+        $response = $client->getResponse();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount(
+            1,
+            $crawler->filter('.form-error-message:contains("Date de fin doit être après la date de début")'),
+            ''
+        );
+    }
+
+    /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerAbsenceAlreadyTaken()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
+
+        $form = $crawler->selectButton('Déposer')->form([
+            'deposer_absence[debut]' => '2019-04-24',
+            'deposer_absence[fin]' => '2019-04-25',
+            'deposer_absence[type]' => '1',
+        ]);
+
+        $crawler = $client->submit($form);
+        $response = $client->getResponse();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount(
+            1,
+            $crawler->filter('.form-error-message:contains("Une absence pour ces dates a été déjà déposée")'),
+            ''
+        );
+    }
+
+    /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerAbsenceJoursDisponiblesInsuffisants()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
+
+        $form = $crawler->selectButton('Déposer')->form([
+            'deposer_absence[debut]' => '2019-04-25',
+            'deposer_absence[fin]' => '2019-04-26',
+            'deposer_absence[type]' => '2',
+        ]);
+
+        $crawler = $client->submit($form);
+        $response = $client->getResponse();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount(
+            1,
+            $crawler->filter('.form-error-message:contains("Il ne vous reste plus de jours disponibles pour ce type d\'absence")'),
+            ''
+        );
+    }
+
+    /**
+     * @see AbsenceController::modifier()
+     */
+    public function testModifier()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/modifier/rsanchez@webnet.fr/1');
+
+        $this->assertCount(
+            1,
+            $crawler->filter('h3:contains("Mettre à jour une absence pour rsanchez@webnet.fr")'),
+            ''
+        );
+
+        $debutInput = $crawler->filter('input[name="deposer_absence[debut]"]');
+        $this->assertCount(1, $debutInput, '');
+        $this->assertEquals('2019-04-20', $debutInput->attr('value'), 'Le champ "Début" contient la date 20/04/2019');
+
+        $finInput = $crawler->filter('input[name="deposer_absence[fin]"]');
+        $this->assertCount(1, $finInput, '');
+        $this->assertEquals('2019-04-24', $finInput->attr('value'), 'Le champ "Fin" contient la date 24/04/2019');
+
+        $finInput = $crawler->filter('select[name="deposer_absence[type]"]');
+        $this->assertCount(1, $finInput, '');
+        $this->assertEquals(
+            '2',
+            $finInput->filter('option[selected="selected"]')->attr('value'),
+            'Le champ "Type" contient la valeur 2 "Congé payé"'
+        );
+    }
+
+    /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerNotFoundException()
+    {
+        $client = static::createClient();
+        $client->request('GET', '/absence/deposer/not_exist@webnet.fr');
+
+        $response = $client->getResponse();
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /**
@@ -254,7 +375,7 @@ class AbsenceControllerTest extends WebTestCase
     public function testCompteursNotFoundException()
     {
         $client = static::createClient();
-        $client->request('GET', '/personne/not_exist@webnet.fr');
+        $client->request('GET', '/compteurs/jours_disponibles/not_exist@webnet.fr');
 
         $response = $client->getResponse();
         $this->assertEquals(404, $response->getStatusCode());
