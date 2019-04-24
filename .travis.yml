@@ -6,6 +6,7 @@ php:
   - 7.3
 
 before_install:
+  - mv .env.test.travis .env.test.local
   - composer self-update
   - composer validate
 
