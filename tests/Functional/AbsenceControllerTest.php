@@ -292,6 +292,18 @@ class AbsenceControllerTest extends WebTestCase
     }
 
     /**
+     * @see AbsenceController::deposer()
+     */
+    public function testDeposerNotFoundException()
+    {
+        $client = static::createClient();
+        $client->request('GET', '/absence/deposer/not_exist@webnet.fr');
+
+        $response = $client->getResponse();
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    /**
      * @see AbsenceController::modifier()
      */
     public function testModifier()
@@ -322,13 +334,49 @@ class AbsenceControllerTest extends WebTestCase
         );
     }
 
+    public function testModifierNoCounterCheck()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/modifier/rsanchez@webnet.fr/1');
+
+        $form = $crawler->selectButton('Modifier')->form([
+            'deposer_absence[debut]' => '2019-04-27',
+            'deposer_absence[fin]' => '2019-04-27',
+            'deposer_absence[type]' => '2',
+        ]);
+
+        $client->submit($form);
+        $response = $client->getResponse();
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(
+            '/absence/calendrier/rsanchez@webnet.fr',
+            $response->headers->get('location'),
+            ''
+        );
+        $crawler = $client->followRedirect();
+
+        $absences = $crawler->filter('#table-calendrier tbody tr');
+        $this->assertCount(1, $absences, '1 absence est présente');
+
+        $absence = $absences->eq(0)->filter('td.bg-info[colspan="1"]');
+        $this->assertCount(1, $absence, '1 absence de 1 jours est présente');
+
+
+    }
+
     /**
      * @see AbsenceController::deposer()
      */
-    public function testDeposerNotFoundException()
+    public function testModifierNotFoundException()
     {
         $client = static::createClient();
-        $client->request('GET', '/absence/deposer/not_exist@webnet.fr');
+        $client->request('GET', '/absence/modifier/rsanchez@webnet.fr/123');
+
+        $response = $client->getResponse();
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $client->request('GET', '/absence/modifier/not_exist@webnet.fr/1');
 
         $response = $client->getResponse();
         $this->assertEquals(404, $response->getStatusCode());

@@ -3,10 +3,13 @@
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Domain\Absence;
+use App\Domain\Exception\AbsenceNotFoundException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
 /**
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
@@ -78,13 +81,17 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
      */
     public function getAbsence(Personne $personne, $id)
     {
-        return $this->createQuerybuilder('a')
-            ->andWhere('a.id = :id')
-            ->andWhere('a.personne = :personne')
-            ->setParameter('id', $id)
-            ->setParameter('personne', $personne)
-            ->getQuery()
-            ->getSingleResult();
+        try {
+            return $this->createQuerybuilder('a')
+                ->andWhere('a.id = :id')
+                ->andWhere('a.personne = :personne')
+                ->setParameter('id', $id)
+                ->setParameter('personne', $personne)
+                ->getQuery()
+                ->getSingleResult();
+        } catch (NoResultException $e) {
+            throw new AbsenceNotFoundException('Absence n\'est pas trouvée');
+        }
     }
 
     /**
