@@ -49,15 +49,13 @@ class PersonneControllerTest extends WebTestCase
 
         $client->submit($form);
 
-        $this->assertEquals(
-            '/',
-            $client->getResponse()->headers->get('location'),
-            'Redirigé vers la page /personne après la création d\'une nouvelle personne'
-        );
-
         $response = $client->getResponse();
         $this->assertEquals(302, $response->getStatusCode());
-        $this->assertEquals('/', $response->headers->get('location'));
+        $this->assertEquals(
+            '/',
+            $response->headers->get('location'),
+            'Redirigé vers la page /personne après la création d\'une nouvelle personne'
+        );
         $crawler = $client->followRedirect();
 
         $this->assertCount(
@@ -77,6 +75,46 @@ class PersonneControllerTest extends WebTestCase
             $crawler->filter('table tbody tr')->eq(1)->filter('td')->eq(1)->text(),
             'La personne ajouté a un nom assigné'
         );
+    }
+
+    /**
+     * @see PersonneController::creer()
+     *
+     * @depends testLister
+     */
+    public function testCreerEmailAlreadyTaken()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/personne');
+
+        $form = $crawler->selectButton('Ajouter')->form([
+            'creer_personne[email]' => 'rsanchez@webnet.fr',
+            'creer_personne[nom]' => 'Rick',
+        ]);
+
+        $crawler = $client->submit($form);
+
+        $response = $client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount(
+            1,
+            $crawler->filter('.form-error-message:contains("rsanchez@webnet.fr a été déjà enregistré")'),
+            'Le message "rsanchez@webnet.fr a été déjà enregistré" est affiché'
+        );
+    }
+
+    /**
+     * @see PersonneController::modifier()
+     *
+     * @depends testLister
+     */
+    public function testModifierNotFoundException()
+    {
+        $client = static::createClient();
+        $client->request('GET', '/personne/not_exist@webnet.fr');
+
+        $response = $client->getResponse();
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /**

@@ -23,7 +23,7 @@ class AppFixtures extends Fixture
         $om->persist($rick);
         $om->persist($this->createAbsenceCompteur($rick, AbsenceType::CONGES_PAYES, 1, 9));
         $om->persist($this->createAbsenceCompteur($rick, AbsenceType::TELETRAVAIL, 0, 2));
-        $om->persist($this->createAbsence($rick, AbsenceType::CONGES_PAYES, new \DateTimeImmutable('2019-04-22 00:00:00'), new \DateTimeImmutable('2019-04-24 00:00:00')));
+        $om->persist($this->createAbsence($rick, AbsenceType::CONGES_PAYES, new \DateTimeImmutable('2019-04-20 00:00:00'), new \DateTimeImmutable('2019-04-24 00:00:00')));
 
         $morthy = $this->createPersonne('msmith@webnet.fr', 'Morthy');
         $om->persist($morthy);
