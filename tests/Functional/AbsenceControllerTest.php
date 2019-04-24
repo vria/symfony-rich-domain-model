@@ -68,13 +68,13 @@ class AbsenceControllerTest extends WebTestCase
 
         $this->assertCount(
             1,
-            $absence->filter('a[href="/absence/modifier/rsanchez@webnet.fr/1"]:contains("Congé payé (22/04/2019 - 24/04/2019)")'),
+            $absence->filter('a:contains("Congé payé (22/04/2019 - 24/04/2019)")'),
             'Congé est présente'
         );
 
         $this->assertCount(
             1,
-            $absence->filter('a[href="/absence/annuler/rsanchez@webnet.fr/1"]'),
+            $absence->filter('a .fa-trash'),
             'Lien d\'annulation du congé est présente'
         );
     }
