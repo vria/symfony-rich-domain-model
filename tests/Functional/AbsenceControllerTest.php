@@ -82,6 +82,64 @@ class AbsenceControllerTest extends WebTestCase
     /**
      * @see AbsenceController::calendrier()
      */
+    public function testCalendrierSemaine20190418()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/absence/calendrier/rsanchez@webnet.fr/2019-04-18');
+
+        $this->assertCount(
+            1,
+            $crawler->filter('h3:contains("Absences de Rick de 15/04/2019 à 21/04/2019")'),
+            "Calendrier affiche une semaine de 15/04/2019 à 21/04/2019"
+        );
+
+        $this->assertCount(
+            1,
+            $crawler->filter('a[href="/absence/calendrier/rsanchez@webnet.fr/2019-04-08"]:contains("Précédente")'),
+            'Une lien vers le calendrier de la semaine précédante est presente'
+        );
+
+        $this->assertCount(
+            1,
+            $crawler->filter('a[href="/absence/calendrier/rsanchez@webnet.fr/2019-04-22"]:contains("Suivante")'),
+            'Une lien vers le calendrier de la semaine suivante est presente'
+        );
+
+        $calendrier = $crawler->filter('#table-calendrier');
+
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(0)->filter(':contains("15/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(1)->filter(':contains("16/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(2)->filter(':contains("17/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(3)->filter(':contains("18/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(4)->filter(':contains("19/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(5)->filter(':contains("20/04")'));
+        $this->assertCount(1, $calendrier->filter('tr th')->eq(6)->filter(':contains("21/04")'));
+
+        $absences = $calendrier->filter('tbody tr');
+        $this->assertCount(1, $absences, '1 absence est présente');
+
+        $absenceOffset = $absences->eq(0)->filter('td')->eq(0);
+        $this->assertEquals(5, $absenceOffset->attr('colspan'));
+
+        $absence = $absences->eq(0)->filter('td')->eq(1);
+        $this->assertEquals(2, $absence->attr('colspan'));
+
+        $this->assertCount(
+            1,
+            $absence->filter('a:contains("Congé payé (20/04/2019 - 24/04/2019)")'),
+            'Congé est présente'
+        );
+
+        $this->assertCount(
+            1,
+            $absence->filter('a .fa-trash'),
+            'Lien d\'annulation du congé est présente'
+        );
+    }
+
+    /**
+     * @see AbsenceController::calendrier()
+     */
     public function testCalendrierNotFoundException()
     {
         $client = static::createClient();

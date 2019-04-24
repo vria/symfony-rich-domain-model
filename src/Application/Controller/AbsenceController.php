@@ -51,7 +51,7 @@ class AbsenceController
         }
 
         if ($startPeriod) {
-            $startPeriod = new \DateTimeImmutable($startPeriod);
+            $startPeriod = (new \DateTimeImmutable($startPeriod))->modify('monday this week');
         } else {
             $startPeriod = (\DateTimeImmutable::createFromFormat('U', time()))->modify('monday this week');
         }
