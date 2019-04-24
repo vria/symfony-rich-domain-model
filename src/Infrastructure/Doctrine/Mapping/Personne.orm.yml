@@ -4,6 +4,7 @@ App\Domain\Personne:
   id:
     email:
       type: string
+      length: 128
 
   fields:
     nom:
