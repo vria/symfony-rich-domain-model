@@ -68,7 +68,7 @@ class AbsenceControllerTest extends WebTestCase
 
         $this->assertCount(
             1,
-            $absence->filter('a:contains("Congé payé (22/04/2019 - 24/04/2019)")'),
+            $absence->filter('a:contains("Congé payé (20/04/2019 - 24/04/2019)")'),
             'Congé est présente'
         );
 
