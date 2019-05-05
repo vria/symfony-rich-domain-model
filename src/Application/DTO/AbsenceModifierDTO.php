@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @see \App\Application\Controller\PersonneController::deposerAbsence()
  * @see \App\Application\Service\PersonneService::deposerAbsence()
- * @see \App\Application\Form\DeposerAbsenceType
+ * @see \App\Application\Form\AbsenceDeposerType
  *
  * Les champs de cet objet sont validés lors de soumission du formulaire.
  *
@@ -19,15 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class DeposerAbsenceDTO
+class AbsenceModifierDTO
 {
-    /**
-     * @var int
-     *
-     * @Assert\NotNull()
-     */
-    public $type;
-
     /**
      * @var \DateTimeImmutable
      *
@@ -41,36 +34,34 @@ class DeposerAbsenceDTO
      * @Assert\NotNull()
      */
     public $fin;
+
     /**
-     * L'email d'une personne n'est pas modifiable lors du dépôt d'absence.
+     * @var int
+     *
+     * @Assert\NotNull()
+     */
+    public $type;
+
+    /**
+     * Id d'une absence.
      *
      * @var string
      */
-    private $email;
+    private $id;
 
     /**
-     * @param string $email
-     */
-    public function __construct(string $email)
-    {
-        $this->email = $email;
-        $this->debut = new \DateTimeImmutable('tomorrow');
-        $this->fin = new \DateTimeImmutable('tomorrow');
-    }
-
-    /**
-     * @param string  $email
      * @param Absence $absence
      *
      * @return static
      */
-    public static function fromAbsence(string $email, Absence $absence)
+    public static function fromAbsence(Absence $absence)
     {
-        $dto = new static($email);
+        $dto = new self();
 
-        $dto->type = $absence->getType();
         $dto->debut = $absence->getDebut();
         $dto->fin = $absence->getFin();
+        $dto->type = $absence->getType()->getType();
+        $dto->id = $absence->getId();
 
         return $dto;
     }
@@ -78,8 +69,8 @@ class DeposerAbsenceDTO
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getId(): string
     {
-        return $this->email;
+        return $this->id;
     }
 }

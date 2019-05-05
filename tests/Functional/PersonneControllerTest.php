@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * @see PersonneController
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
+ *
+ * @internal
  */
 class PersonneControllerTest extends WebTestCase
 {
@@ -43,8 +45,8 @@ class PersonneControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/personne');
 
         $form = $crawler->selectButton('Ajouter')->form([
-            'creer_personne[email]' => 'jsmith@webnet.fr',
-            'creer_personne[nom]' => 'Jerry',
+            'personne_creer[email]' => 'jsmith@webnet.fr',
+            'personne_creer[nom]' => 'Jerry',
         ]);
 
         $client->submit($form);
@@ -88,8 +90,8 @@ class PersonneControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/personne');
 
         $form = $crawler->selectButton('Ajouter')->form([
-            'creer_personne[email]' => 'rsanchez@webnet.fr',
-            'creer_personne[nom]' => 'Rick',
+            'personne_creer[email]' => 'rsanchez@webnet.fr',
+            'personne_creer[nom]' => 'Rick',
         ]);
 
         $crawler = $client->submit($form);
@@ -129,18 +131,18 @@ class PersonneControllerTest extends WebTestCase
 
         $this->assertEquals(
             'rsanchez@webnet.fr',
-            $crawler->filter('input[name="creer_personne[email]"]')->attr('value'),
+            $crawler->filter('input[name="personne_modifier[email]"]')->attr('value'),
             'Champ "Email" contient le mail de la personne'
         );
 
         $this->assertEquals(
             'Rick',
-            $crawler->filter('input[name="creer_personne[nom]"]')->attr('value'),
+            $crawler->filter('input[name="personne_modifier[nom]"]')->attr('value'),
             'Champ "Nom" contient le nom de la personne'
         );
 
         $form = $crawler->selectButton('Modifier')->form([
-            'creer_personne[nom]' => 'Sanchez',
+            'personne_modifier[nom]' => 'Sanchez',
         ]);
 
         $client->submit($form);

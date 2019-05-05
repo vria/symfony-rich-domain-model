@@ -2,7 +2,7 @@
 
 namespace App\Application\Form;
 
-use App\Application\DTO\CreerPersonneDTO;
+use App\Application\DTO\PersonneCreerDTO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class CreerPersonneType extends AbstractType
+class PersonneCreerType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -26,7 +26,6 @@ class CreerPersonneType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'disabled' => $options['edit'],
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
@@ -40,8 +39,7 @@ class CreerPersonneType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => CreerPersonneDTO::class,
-            'edit' => false,
+            'data_class' => PersonneCreerDTO::class,
         ]);
     }
 }

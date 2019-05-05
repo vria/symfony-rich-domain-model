@@ -15,7 +15,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 class AppFixtures extends Fixture
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function load(ObjectManager $om)
     {
@@ -40,55 +40,8 @@ class AppFixtures extends Fixture
     }
 
     /**
-     * @param $email
-     * @param $nom
-     *
-     * @return Personne
-     */
-    private function createPersonne($email, $nom)
-    {
-        $reflClass = new \ReflectionClass(Personne::class);
-        $personne = $reflClass->newInstanceWithoutConstructor();
-
-        $reflProp = $reflClass->getProperty('email');
-        $reflProp->setAccessible(true);
-        $reflProp->setValue($personne, $email);
-
-        $reflProp = $reflClass->getProperty('nom');
-        $reflProp->setAccessible(true);
-        $reflProp->setValue($personne, $nom);
-
-        return $personne;
-    }
-
-    /**
-     * @param Personne $personne
-     * @param int $type
-     * @param int $joursDisponibles
-     * @param int $joursTravailles
-     *
-     * @return AbsenceCompteur
-     */
-    private function createAbsenceCompteur(Personne $personne, int $type, int $joursDisponibles, int $joursTravailles)
-    {
-        $compteur = new AbsenceCompteur($personne, $type);
-
-        $reflClass = new \ReflectionClass(AbsenceCompteur::class);
-
-        $reflProp = $reflClass->getProperty('joursDisponibles');
-        $reflProp->setAccessible(true);
-        $reflProp->setValue($compteur, $joursDisponibles);
-
-        $reflProp = $reflClass->getProperty('joursTravailles');
-        $reflProp->setAccessible(true);
-        $reflProp->setValue($compteur, $joursTravailles);
-
-        return $compteur;
-    }
-
-    /**
-     * @param Personne $personne
-     * @param int $type
+     * @param Personne           $personne
+     * @param int                $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
@@ -116,5 +69,52 @@ class AppFixtures extends Fixture
         $reflProp->setValue($absence, $fin);
 
         return $absence;
+    }
+
+    /**
+     * @param $email
+     * @param $nom
+     *
+     * @return Personne
+     */
+    private function createPersonne($email, $nom)
+    {
+        $reflClass = new \ReflectionClass(Personne::class);
+        $personne = $reflClass->newInstanceWithoutConstructor();
+
+        $reflProp = $reflClass->getProperty('email');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($personne, $email);
+
+        $reflProp = $reflClass->getProperty('nom');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($personne, $nom);
+
+        return $personne;
+    }
+
+    /**
+     * @param Personne $personne
+     * @param int      $type
+     * @param int      $joursDisponibles
+     * @param int      $joursTravailles
+     *
+     * @return AbsenceCompteur
+     */
+    private function createAbsenceCompteur(Personne $personne, int $type, int $joursDisponibles, int $joursTravailles)
+    {
+        $compteur = new AbsenceCompteur($personne, $type);
+
+        $reflClass = new \ReflectionClass(AbsenceCompteur::class);
+
+        $reflProp = $reflClass->getProperty('joursDisponibles');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($compteur, $joursDisponibles);
+
+        $reflProp = $reflClass->getProperty('joursTravailles');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($compteur, $joursTravailles);
+
+        return $compteur;
     }
 }

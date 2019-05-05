@@ -15,17 +15,19 @@ use Symfony\Bridge\PhpUnit\ClockMock;
  * Unit test case of @see Personne class.
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
+ *
+ * @internal
  */
 class PersonneTest extends TestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function setUpBeforeClass()
     {
         // Fixer la date 25/04/2019 pour la classe Absence.
         ClockMock::register(Absence::class);
-        ClockMock::withClockMock(strtotime("2019-04-25 15:00:00"));
+        ClockMock::withClockMock(strtotime('2019-04-25 15:00:00'));
     }
 
     /**
@@ -149,15 +151,16 @@ class PersonneTest extends TestCase
         $absenceRepository
             ->expects($this->once())
             ->method('save')
-            ->will($this->returnCallback(function($absence) use ($testCase, $debut, $fin) {
-                /** @var $absence Absence */
+            ->will($this->returnCallback(function ($absence) use ($testCase, $debut, $fin) {
+                /* @var $absence Absence */
 
                 $testCase->assertInstanceOf(Absence::class, $absence);
                 $testCase->assertInstanceOf(AbsenceType::class, $absence->getType());
                 $testCase->assertEquals(AbsenceType::MALADIE, $absence->getType()->getType());
                 $testCase->assertEquals($debut, $absence->getDebut());
                 $testCase->assertEquals($fin, $absence->getFin());
-            }));
+            }))
+        ;
         $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
         $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);

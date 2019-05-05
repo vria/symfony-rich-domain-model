@@ -2,8 +2,9 @@
 
 namespace App\Application\Controller;
 
-use App\Application\DTO\CreerPersonneDTO;
-use App\Application\Form\CreerPersonneType;
+use App\Application\DTO\PersonneCreerDTO;
+use App\Application\Form\PersonneCreerType;
+use App\Application\Form\PersonneModifierType;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
@@ -57,8 +58,8 @@ class PersonneController
      */
     public function creer(Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneFactory)
     {
-        $creerPersonneDTO = new CreerPersonneDTO();
-        $form = $formFactory->create(CreerPersonneType::class, $creerPersonneDTO);
+        $creerPersonneDTO = new PersonneCreerDTO();
+        $form = $formFactory->create(PersonneCreerType::class, $creerPersonneDTO);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -86,12 +87,11 @@ class PersonneController
      * @param Request                     $request
      * @param FormFactoryInterface        $formFactory
      * @param UrlGeneratorInterface       $urlGenerator
-     * @param PersonneService             $personneFactory
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse
      */
-    public function modifier(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneFactory, PersonneRepositoryInterface $personneRepository)
+    public function modifier(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository)
     {
         try {
             $personne = $personneRepository->get($email);
@@ -99,14 +99,11 @@ class PersonneController
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        $modifierPersonneDTO = CreerPersonneDTO::fromPerson($personne);
-        $form = $formFactory->create(CreerPersonneType::class, $modifierPersonneDTO, [
-            'edit' => true,
-        ]);
+        $form = $formFactory->create(PersonneModifierType::class, $personne);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $personneFactory->update($personne, $modifierPersonneDTO);
+            $personneRepository->save($personne);
 
             return new RedirectResponse($urlGenerator->generate('personne_lister'));
         }

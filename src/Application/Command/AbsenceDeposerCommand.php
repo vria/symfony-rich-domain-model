@@ -2,7 +2,7 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\DeposerAbsenceDTO;
+use App\Application\DTO\AbsenceDeposerDTO;
 use App\Application\Service\PersonneService;
 use App\Domain\AbsenceType;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
@@ -81,7 +81,7 @@ class AbsenceDeposerCommand extends Command
         }
 
         // Construire DTO.
-        $personneUpdateDTO = new DeposerAbsenceDTO($personnne->getEmail());
+        $personneUpdateDTO = new AbsenceDeposerDTO($personnne->getEmail());
 
         // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');

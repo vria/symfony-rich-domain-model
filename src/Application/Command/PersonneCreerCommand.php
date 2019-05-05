@@ -2,7 +2,7 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\CreerPersonneDTO;
+use App\Application\DTO\PersonneCreerDTO;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use Symfony\Component\Console\Command\Command;
@@ -60,7 +60,7 @@ class PersonneCreerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Construire DTO.
-        $creerPersonneDTO = new CreerPersonneDTO();
+        $creerPersonneDTO = new PersonneCreerDTO();
         $creerPersonneDTO->email = $input->getArgument('email');
         $creerPersonneDTO->nom = $input->getArgument('nom');
 

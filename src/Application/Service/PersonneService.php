@@ -2,10 +2,9 @@
 
 namespace App\Application\Service;
 
-use App\Application\DTO\CreerPersonneDTO;
-use App\Application\DTO\DeposerAbsenceDTO;
-use App\Application\DTO\ModifierAbsenceDTO;
-use App\Domain\Absence;
+use App\Application\DTO\AbsenceDeposerDTO;
+use App\Application\DTO\AbsenceModifierDTO;
+use App\Application\DTO\PersonneCreerDTO;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceTypeInvalidException;
@@ -47,11 +46,11 @@ class PersonneService
     /**
      * Ajouter une personne.
      *
-     * @param CreerPersonneDTO $personneCreateDTO
+     * @param PersonneCreerDTO $personneCreateDTO
      *
      * @throws PersonneEmailAlreadyTakenException
      */
-    public function create(CreerPersonneDTO $personneCreateDTO)
+    public function create(PersonneCreerDTO $personneCreateDTO)
     {
         $personne = new Personne(
             $personneCreateDTO->email,
@@ -65,29 +64,16 @@ class PersonneService
     }
 
     /**
-     * Modifier les données d'une personne.
-     *
-     * @param Personne         $personne
-     * @param CreerPersonneDTO $personneUpdateDTO
-     */
-    public function update(Personne $personne, CreerPersonneDTO $personneUpdateDTO)
-    {
-        $personne->update($personneUpdateDTO->nom);
-
-        $this->personneRepository->save($personne);
-    }
-
-    /**
      * Déposer une absence.
      *
      * @param Personne          $personne
-     * @param DeposerAbsenceDTO $deposerAbsenceDTO
+     * @param AbsenceDeposerDTO $deposerAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException
      * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
      */
-    public function deposerAbsence(Personne $personne, DeposerAbsenceDTO $deposerAbsenceDTO)
+    public function deposerAbsence(Personne $personne, AbsenceDeposerDTO $deposerAbsenceDTO)
     {
         $personne->deposerAbsence(
             $deposerAbsenceDTO->type,
@@ -100,13 +86,13 @@ class PersonneService
 
     /**
      * @param Personne           $personne
-     * @param ModifierAbsenceDTO $modifierAbsenceDTO
+     * @param AbsenceModifierDTO $modifierAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException
      * @throws AbsenceDatesInvalidesException
      * @throws AbsenceTypeInvalidException
      */
-    public function modifierAbsence(Personne $personne, ModifierAbsenceDTO $modifierAbsenceDTO)
+    public function modifierAbsence(Personne $personne, AbsenceModifierDTO $modifierAbsenceDTO)
     {
         $personne->modifierAbsence(
             $modifierAbsenceDTO->getId(),

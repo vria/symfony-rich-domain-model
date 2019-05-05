@@ -2,9 +2,9 @@
 
 namespace App\Application\Controller;
 
-use App\Application\DTO\DeposerAbsenceDTO;
-use App\Application\DTO\ModifierAbsenceDTO;
-use App\Application\Form\DeposerAbsenceType;
+use App\Application\DTO\AbsenceDeposerDTO;
+use App\Application\DTO\AbsenceModifierDTO;
+use App\Application\Form\AbsenceDeposerType;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
 use App\Domain\Exception\AbsenceDatesInvalidesException;
@@ -53,7 +53,7 @@ class AbsenceController
         if ($startPeriod) {
             $startPeriod = (new \DateTimeImmutable($startPeriod))->modify('monday this week');
         } else {
-            $startPeriod = (\DateTimeImmutable::createFromFormat('U', time()))->modify('monday this week');
+            $startPeriod = \DateTimeImmutable::createFromFormat('U', time())->modify('monday this week');
         }
 
         $endPeriod = $startPeriod->modify('sunday this week');
@@ -88,8 +88,8 @@ class AbsenceController
             throw new NotFoundHttpException();
         }
 
-        $deposerAbsenceDTO = new DeposerAbsenceDTO($personne->getEmail());
-        $form = $formFactory->create(DeposerAbsenceType::class, $deposerAbsenceDTO);
+        $deposerAbsenceDTO = new AbsenceDeposerDTO();
+        $form = $formFactory->create(AbsenceDeposerType::class, $deposerAbsenceDTO);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -104,6 +104,7 @@ class AbsenceController
 
         return [
             'form' => $form->createView(),
+            'personne' => $personne,
         ];
     }
 
@@ -130,8 +131,8 @@ class AbsenceController
             throw new NotFoundHttpException();
         }
 
-        $modifierAbsenceDTO = ModifierAbsenceDTO::fromAbsence($personne->getEmail(), $absence);
-        $form = $formFactory->create(DeposerAbsenceType::class, $modifierAbsenceDTO);
+        $modifierAbsenceDTO = AbsenceModifierDTO::fromAbsence($absence);
+        $form = $formFactory->create(AbsenceDeposerType::class, $modifierAbsenceDTO);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -146,6 +147,7 @@ class AbsenceController
 
         return [
             'form' => $form->createView(),
+            'personne' => $personne,
         ];
     }
 

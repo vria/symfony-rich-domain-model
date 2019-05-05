@@ -2,7 +2,7 @@
 
 
 {% block container_title %}
-    Deposer une absence pour {{ form.vars.value.email }}
+    Deposer une absence pour {{ personne.email }}
 {% endblock %}
 
 
@@ -15,7 +15,7 @@
         </div>
         {{ form_row(form.type) }}
         <div class="mt-3">
-            <a href="{{ path('personne_absence_calendrier', {email: form.vars.value.email}) }}" class="btn btn-default">
+            <a href="{{ path('personne_absence_calendrier', {email: personne.email}) }}" class="btn btn-default">
                 <i class="fas fa-arrow-left"></i> Annuler
             </a>
             {% block submit_button %}

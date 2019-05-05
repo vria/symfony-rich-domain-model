@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Application\Controller\AbsenceController;
+use App\Application\DTO\AbsenceDeposerDTO;
 use App\Domain\Absence;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -11,17 +12,20 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * @see AbsenceController
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
+ *
+ * @internal
  */
 class AbsenceControllerTest extends WebTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public static function setUpBeforeClass()/* The :void return type declaration that should be here would cause a BC issue */
+    public static function setUpBeforeClass()
     {
         ClockMock::register(Absence::class);
         ClockMock::register(AbsenceController::class);
-        ClockMock::withClockMock(strtotime("2019-04-25 15:00:00"));
+        ClockMock::register(AbsenceDeposerDTO::class);
+        ClockMock::withClockMock(strtotime('2019-04-25 15:00:00'));
     }
 
     /**
@@ -35,7 +39,7 @@ class AbsenceControllerTest extends WebTestCase
         $this->assertCount(
             1,
             $crawler->filter('h3:contains("Absences de Rick de 22/04/2019 à 28/04/2019")'),
-            "Calendrier affiche une semaine en cours par défaut"
+            'Calendrier affiche une semaine en cours par défaut'
         );
 
         $this->assertCount(
@@ -90,7 +94,7 @@ class AbsenceControllerTest extends WebTestCase
         $this->assertCount(
             1,
             $crawler->filter('h3:contains("Absences de Rick de 15/04/2019 à 21/04/2019")'),
-            "Calendrier affiche une semaine de 15/04/2019 à 21/04/2019"
+            'Calendrier affiche une semaine de 15/04/2019 à 21/04/2019'
         );
 
         $this->assertCount(
@@ -163,13 +167,13 @@ class AbsenceControllerTest extends WebTestCase
             ''
         );
 
-        $debutInput = $crawler->filter('input[name="deposer_absence[debut]"]');
+        $debutInput = $crawler->filter('input[name="absence_deposer[debut]"]');
         $this->assertCount(1, $debutInput, '');
-        $this->assertEquals('2019-04-25', $debutInput->attr('value'), 'Le champ "Début" contient la date de demain par défaut');
+        $this->assertEquals('2019-04-26', $debutInput->attr('value'), 'Le champ "Début" contient la date de demain par défaut');
 
-        $finInput = $crawler->filter('input[name="deposer_absence[fin]"]');
+        $finInput = $crawler->filter('input[name="absence_deposer[fin]"]');
         $this->assertCount(1, $finInput, '');
-        $this->assertEquals('2019-04-25', $finInput->attr('value'), 'Le champ "Fin" contient la date de demain par défaut');
+        $this->assertEquals('2019-04-26', $finInput->attr('value'), 'Le champ "Fin" contient la date de demain par défaut');
     }
 
     /**
@@ -181,9 +185,9 @@ class AbsenceControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
 
         $form = $crawler->selectButton('Déposer')->form([
-            'deposer_absence[debut]' => '2019-04-26',
-            'deposer_absence[fin]' => '2019-04-27',
-            'deposer_absence[type]' => '1',
+            'absence_deposer[debut]' => '2019-04-26',
+            'absence_deposer[fin]' => '2019-04-27',
+            'absence_deposer[type]' => '1',
         ]);
 
         $client->submit($form);
@@ -225,9 +229,9 @@ class AbsenceControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
 
         $form = $crawler->selectButton('Déposer')->form([
-            'deposer_absence[debut]' => '2019-04-26',
-            'deposer_absence[fin]' => '2019-04-25',
-            'deposer_absence[type]' => '1',
+            'absence_deposer[debut]' => '2019-04-26',
+            'absence_deposer[fin]' => '2019-04-25',
+            'absence_deposer[type]' => '1',
         ]);
 
         $crawler = $client->submit($form);
@@ -250,9 +254,9 @@ class AbsenceControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
 
         $form = $crawler->selectButton('Déposer')->form([
-            'deposer_absence[debut]' => '2019-04-24',
-            'deposer_absence[fin]' => '2019-04-25',
-            'deposer_absence[type]' => '1',
+            'absence_deposer[debut]' => '2019-04-24',
+            'absence_deposer[fin]' => '2019-04-25',
+            'absence_deposer[type]' => '1',
         ]);
 
         $crawler = $client->submit($form);
@@ -275,9 +279,9 @@ class AbsenceControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');
 
         $form = $crawler->selectButton('Déposer')->form([
-            'deposer_absence[debut]' => '2019-04-25',
-            'deposer_absence[fin]' => '2019-04-26',
-            'deposer_absence[type]' => '2',
+            'absence_deposer[debut]' => '2019-04-25',
+            'absence_deposer[fin]' => '2019-04-26',
+            'absence_deposer[type]' => '2',
         ]);
 
         $crawler = $client->submit($form);
@@ -317,15 +321,15 @@ class AbsenceControllerTest extends WebTestCase
             ''
         );
 
-        $debutInput = $crawler->filter('input[name="deposer_absence[debut]"]');
+        $debutInput = $crawler->filter('input[name="absence_deposer[debut]"]');
         $this->assertCount(1, $debutInput, '');
         $this->assertEquals('2019-04-20', $debutInput->attr('value'), 'Le champ "Début" contient la date 20/04/2019');
 
-        $finInput = $crawler->filter('input[name="deposer_absence[fin]"]');
+        $finInput = $crawler->filter('input[name="absence_deposer[fin]"]');
         $this->assertCount(1, $finInput, '');
         $this->assertEquals('2019-04-24', $finInput->attr('value'), 'Le champ "Fin" contient la date 24/04/2019');
 
-        $finInput = $crawler->filter('select[name="deposer_absence[type]"]');
+        $finInput = $crawler->filter('select[name="absence_deposer[type]"]');
         $this->assertCount(1, $finInput, '');
         $this->assertEquals(
             '2',
@@ -340,9 +344,9 @@ class AbsenceControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/absence/modifier/rsanchez@webnet.fr/1');
 
         $form = $crawler->selectButton('Modifier')->form([
-            'deposer_absence[debut]' => '2019-04-27',
-            'deposer_absence[fin]' => '2019-04-27',
-            'deposer_absence[type]' => '2',
+            'absence_deposer[debut]' => '2019-04-27',
+            'absence_deposer[fin]' => '2019-04-27',
+            'absence_deposer[type]' => '2',
         ]);
 
         $client->submit($form);
@@ -361,8 +365,6 @@ class AbsenceControllerTest extends WebTestCase
 
         $absence = $absences->eq(0)->filter('td.bg-info[colspan="1"]');
         $this->assertCount(1, $absence, '1 absence de 1 jours est présente');
-
-
     }
 
     /**

@@ -65,8 +65,6 @@ interface AbsenceRepositoryInterface
 
     /**
      * @param Absence $absence
-     *
-     * @return void
      */
     public function annuler(Absence $absence);
 }

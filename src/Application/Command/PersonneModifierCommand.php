@@ -2,7 +2,7 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\CreerPersonneDTO;
+use App\Application\DTO\PersonneCreerDTO;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
@@ -78,7 +78,7 @@ class PersonneModifierCommand extends Command
         }
 
         // Construire DTO.
-        $personneUpdateDTO = CreerPersonneDTO::fromPerson($personnne);
+        $personneUpdateDTO = PersonneCreerDTO::fromPerson($personnne);
 
         // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @see \App\Application\Controller\PersonneController::createPerson()
  * @see \App\Application\Service\PersonneService::create()
- * @see \App\Application\Form\CreerPersonneType
+ * @see \App\Application\Form\PersonneCreerType
  *
  * Les champs de cet objet sont validés lors de soumission du formulaire.
  *
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class CreerPersonneDTO
+class PersonneCreerDTO
 {
     /**
      * @var string

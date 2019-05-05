@@ -2,7 +2,7 @@
 
 namespace App\Application\Form;
 
-use App\Application\DTO\DeposerAbsenceDTO;
+use App\Application\DTO\AbsenceDeposerDTO;
 use App\Domain\AbsenceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class DeposerAbsenceType extends AbstractType
+class AbsenceDeposerType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -52,7 +52,7 @@ class DeposerAbsenceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         return [
-            'data_class' => DeposerAbsenceDTO::class,
+            'data_class' => AbsenceDeposerDTO::class,
         ];
     }
 }
