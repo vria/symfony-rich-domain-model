@@ -27,7 +27,7 @@ class PersonneLifecycleListener implements EventSubscriber
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param AbsenceRepositoryInterface $absenceRepository
+     * @param AbsenceRepositoryInterface  $absenceRepository
      */
     public function __construct(PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
     {
@@ -36,7 +36,7 @@ class PersonneLifecycleListener implements EventSubscriber
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSubscribedEvents()
     {
@@ -46,7 +46,7 @@ class PersonneLifecycleListener implements EventSubscriber
     /**
      * @ORM\PostLoad()
      *
-     * @var LifecycleEventArgs $event
+     * @var LifecycleEventArgs
      */
     public function postLoad(LifecycleEventArgs $event)
     {

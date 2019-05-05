@@ -2,8 +2,8 @@
 
 namespace App\Domain\DTO;
 
-use App\Domain\AbsenceType;
 use App\Domain\AbsenceCompteur;
+use App\Domain\AbsenceType;
 
 /**
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
@@ -16,17 +16,17 @@ class CompteurInfoDTO
     public $compteur;
 
     /**
-     * @var integer
+     * @var int
      */
     public $joursDisponibles;
 
     /**
-     * @var integer
+     * @var int
      */
     public $joursTravailles;
 
     /**
-     * @var integer
+     * @var int
      */
     public $periodeIncrementer;
 

@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DeposerAbsenceType extends AbstractType
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -41,13 +41,13 @@ class DeposerAbsenceType extends AbstractType
                     'Maladie' => AbsenceType::MALADIE,
                     'Congé payé' => AbsenceType::CONGES_PAYES,
                     'Télétravail' => AbsenceType::TELETRAVAIL,
-                ]
+                ],
             ])
         ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {

@@ -35,7 +35,7 @@ class AbsenceType
      */
     public function __construct(int $type)
     {
-        if (!in_array($type, [self::MALADIE, self::CONGES_PAYES, self::TELETRAVAIL])) {
+        if (!\in_array($type, [self::MALADIE, self::CONGES_PAYES, self::TELETRAVAIL], true)) {
             throw new AbsenceTypeInvalidException("Type d'absence inconnu");
         }
 
@@ -58,15 +58,15 @@ class AbsenceType
     public static function getLabel($type)
     {
         switch ($type) {
-            case AbsenceType::MALADIE:
+            case self::MALADIE:
                 return 'Maladie';
-            case AbsenceType::CONGES_PAYES:
+            case self::CONGES_PAYES:
                 return 'Congé payé';
-            case AbsenceType::TELETRAVAIL:
+            case self::TELETRAVAIL:
                 return 'Télétravail';
         }
 
-        throw new \InvalidArgumentException;
+        throw new \InvalidArgumentException();
     }
 
     /**
@@ -76,7 +76,7 @@ class AbsenceType
      *
      * @return bool
      */
-    public function isEqualTo(AbsenceType $absenceType)
+    public function isEqualTo(self $absenceType)
     {
         return $this->type === $absenceType->getType();
     }

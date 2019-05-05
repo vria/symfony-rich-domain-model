@@ -32,7 +32,7 @@ class PersonneCreerCommand extends Command
     private $validator;
 
     /**
-     * @param PersonneService $personneService
+     * @param PersonneService    $personneService
      * @param ValidatorInterface $validator
      */
     public function __construct(PersonneService $personneService, ValidatorInterface $validator)
@@ -44,17 +44,18 @@ class PersonneCreerCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setDescription('Créer une nouvelle personne.')
             ->addArgument('email', InputArgument::REQUIRED)
-            ->addArgument('nom', InputArgument::REQUIRED);
+            ->addArgument('nom', InputArgument::REQUIRED)
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -67,7 +68,7 @@ class PersonneCreerCommand extends Command
         $constraintViolationList = $this->validator->validate($creerPersonneDTO);
         if ($constraintViolationList->count() > 0) {
             foreach ($constraintViolationList as $violation) {
-                /** @var $violation ConstraintViolationInterface */
+                /* @var $violation ConstraintViolationInterface */
                 $output->writeln(sprintf('<error>%s: %s</error>', $violation->getPropertyPath(), $violation->getMessage()));
             }
 

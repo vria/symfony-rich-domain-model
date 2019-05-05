@@ -52,13 +52,12 @@ class Absence
      * @internal
      *   Absence peut être créée seulement via @see Personne
      *
-     * @param Personne $personne
-     * @param int $type
+     * @param Personne           $personne
+     * @param int                $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
      * @throws AbsenceDatesInvalidesException
-     *
      * @throws
      */
     public function __construct(Personne $personne, int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
@@ -72,7 +71,7 @@ class Absence
      * @internal
      *   Absence peut être modifiée seulement via @see Personne
      *
-     * @param int $type
+     * @param int                $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *

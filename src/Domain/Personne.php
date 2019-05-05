@@ -24,6 +24,7 @@ use App\Domain\Service\AbsenceCompteurService;
  * - création d'une nouvelle personne dans @see \App\Application\Service\PersonneService::create().
  *   Dans ce cas le @see Personne::__construct() est appelé.
  * - reconstitution d'une personne de la bdd par
+ *
  *   @see \App\Infrastructure\Doctrine\Repository\PersonneRepository::get().
  *   Doctrine utilise la réflexion pour intitialiser les champs sans appeler le constructeur.
  *
@@ -55,7 +56,7 @@ class Personne
 
     /**
      * Répositoire de la personne.
-     * Permet de communiquer avec la couche de persistance (bdd) afin de
+     * Permet de communiquer avec la couche de persistance (bdd) afin de.
      *
      * @var PersonneRepositoryInterface
      */
@@ -72,11 +73,11 @@ class Personne
     private $absenceCompteurService;
 
     /**
-     * @param string $email
-     * @param string $nom
+     * @param string                      $email
+     * @param string                      $nom
      * @param PersonneRepositoryInterface $personneRepository
-     * @param AbsenceRepositoryInterface $absenceRepository
-     * @param AbsenceCompteurService $absenceCompteurService
+     * @param AbsenceRepositoryInterface  $absenceRepository
+     * @param AbsenceCompteurService      $absenceCompteurService
      */
     public function __construct(string $email, string $nom, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository, AbsenceCompteurService $absenceCompteurService)
     {
@@ -123,7 +124,7 @@ class Personne
      * Déposer une absence.
      * Il n'est pas possible de déposer une absence qui chevauche une absence déjà existante.
      *
-     * @param int $type
+     * @param int                $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
@@ -149,7 +150,7 @@ class Personne
      * @param $id
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
-     * @param int $type
+     * @param int                $type
      *
      * @throws AbsenceAlreadyTakenException
      * @throws AbsenceDatesInvalidesException
@@ -195,9 +196,9 @@ class Personne
     /**
      * @param $id
      *
-     * @return Absence
-     *
      * @throws AbsenceNotFoundException
+     *
+     * @return Absence
      */
     public function getAbsence($id)
     {
@@ -205,9 +206,9 @@ class Personne
     }
 
     /**
-     * @var \DateTimeImmutable $date
+     * @var \DateTimeImmutable
      *
-     * Incrémenter les jours travailles dans les compteurs concernés.
+     * Incrémenter les jours travailles dans les compteurs concernés
      */
     public function incrementerJoursTravailles(\DateTimeImmutable $date)
     {

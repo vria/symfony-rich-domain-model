@@ -6,7 +6,8 @@ use App\Domain\Personne;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Objet de transfert de données pour:
+ * Objet de transfert de données pour:.
+ *
  * @see \App\Application\Controller\PersonneController::createPerson()
  * @see \App\Application\Service\PersonneService::create()
  * @see \App\Application\Form\CreerPersonneType
@@ -42,7 +43,7 @@ class CreerPersonneDTO
      */
     public static function fromPerson(Personne $personne)
     {
-        $dto = new static;
+        $dto = new static();
 
         $dto->email = $personne->getEmail();
         $dto->nom = $personne->getNom();

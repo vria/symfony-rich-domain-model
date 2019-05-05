@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class AbsenceIncrementerCompteursAbsence extends Command
+class AbsenceIncrementerCompteursCommand extends Command
 {
     protected static $defaultName = 'app:absence:incrementer-compteurs';
 
@@ -32,16 +32,17 @@ class AbsenceIncrementerCompteursAbsence extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setDescription('Incrementer des jours travaillés.')
-            ->addArgument('date', InputArgument::REQUIRED, 'La date');
+            ->addArgument('date', InputArgument::REQUIRED, 'La date')
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -56,7 +57,7 @@ class AbsenceIncrementerCompteursAbsence extends Command
         }
 
         foreach ($personnes as $personne) {
-            /** @var $personne Personne */
+            /* @var $personne Personne */
             $personne->incrementerJoursTravailles($date);
             $this->personneRepository->save($personne);
         }

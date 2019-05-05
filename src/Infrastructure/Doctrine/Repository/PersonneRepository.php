@@ -4,12 +4,9 @@ namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Domain\Exception\PersonneNotFoundException;
 use App\Domain\Personne;
-use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\NoResultException;
 
 /**
@@ -18,7 +15,7 @@ use Doctrine\ORM\NoResultException;
 class PersonneRepository extends ServiceEntityRepository implements PersonneRepositoryInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -26,7 +23,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAllInfo(): array
     {
@@ -34,11 +31,12 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
             ->select('p.email, p.nom')
             ->orderBy('p.email', 'ASC')
             ->getQuery()
-            ->getArrayResult();
+            ->getArrayResult()
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function get(string $email): Personne
     {
@@ -51,7 +49,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function save(Personne $personne): void
     {
@@ -60,17 +58,17 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function emailAlreadyExist(string $email): bool
     {
         try {
             return $this->createQueryBuilder('p')
-                    ->select('COUNT(p)')
-                    ->andWhere('p.email = :email')
-                    ->setParameter('email', $email)
-                    ->getQuery()
-                    ->getSingleScalarResult() > 0;
+                ->select('COUNT(p)')
+                ->andWhere('p.email = :email')
+                ->setParameter('email', $email)
+                ->getQuery()
+                ->getSingleScalarResult() > 0;
         } catch (NoResultException $e) {
             return false;
         }

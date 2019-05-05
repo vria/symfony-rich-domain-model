@@ -38,7 +38,7 @@ class PersonneController
     public function lister(PersonneRepositoryInterface $personneRepository)
     {
         return [
-            'personnes' => $personneRepository->getAllInfo()
+            'personnes' => $personneRepository->getAllInfo(),
         ];
     }
 
@@ -48,10 +48,10 @@ class PersonneController
      * @Route("/personne", name="personne_creer")
      * @Template()
      *
-     * @param Request $request
-     * @param FormFactoryInterface $formFactory
+     * @param Request               $request
+     * @param FormFactoryInterface  $formFactory
      * @param UrlGeneratorInterface $urlGenerator
-     * @param PersonneService $personneFactory
+     * @param PersonneService       $personneFactory
      *
      * @return array|RedirectResponse
      */
@@ -72,7 +72,7 @@ class PersonneController
         }
 
         return [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ];
     }
 
@@ -82,16 +82,17 @@ class PersonneController
      * @Route("/personne/{email}", name="personne_modifier")
      * @Template()
      *
-     * @param string $email
-     * @param Request $request
-     * @param FormFactoryInterface $formFactory
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param PersonneService $personneFactory
+     * @param string                      $email
+     * @param Request                     $request
+     * @param FormFactoryInterface        $formFactory
+     * @param UrlGeneratorInterface       $urlGenerator
+     * @param PersonneService             $personneFactory
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse
      */
-    public function modifier(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneFactory, PersonneRepositoryInterface $personneRepository) {
+    public function modifier(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneFactory, PersonneRepositoryInterface $personneRepository)
+    {
         try {
             $personne = $personneRepository->get($email);
         } catch (PersonneNotFoundException $e) {
@@ -111,7 +112,7 @@ class PersonneController
         }
 
         return [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ];
     }
 }

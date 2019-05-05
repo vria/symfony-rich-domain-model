@@ -36,9 +36,9 @@ class AbsenceController
      * @Template()
      *
      * @param PersonneRepositoryInterface $personneRepository
-     * @param string $email
-     * @param string $startPeriod
-     * @param string $endPeriod
+     * @param string                      $email
+     * @param string                      $startPeriod
+     * @param string                      $endPeriod
      *
      * @return array
      */
@@ -71,11 +71,11 @@ class AbsenceController
      * @Route("/absence/deposer/{email}", name="personne_absence_deposer")
      * @Template()
      *
-     * @param string $email
-     * @param Request $request
-     * @param FormFactoryInterface $formFactory
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param PersonneService $personneService
+     * @param string                      $email
+     * @param Request                     $request
+     * @param FormFactoryInterface        $formFactory
+     * @param UrlGeneratorInterface       $urlGenerator
+     * @param PersonneService             $personneService
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse
@@ -97,13 +97,13 @@ class AbsenceController
                 $personneService->deposerAbsence($personne, $deposerAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceDatesInvalidesException|AbsenceAlreadyTakenException|AbsenceJoursDisponiblesInsuffisantsException $e) {
+            } catch (AbsenceDatesInvalidesException | AbsenceAlreadyTakenException | AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
 
         return [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ];
     }
 
@@ -111,13 +111,13 @@ class AbsenceController
      * @Route("/absence/modifier/{email}/{id}", name="personne_absence_modifier")
      * @Template()
      *
-     * @param string $email
-     * @param string $id
-     * @param Request $request
-     * @param FormFactoryInterface $formFactory
-     * @param UrlGeneratorInterface $urlGenerator
+     * @param string                      $email
+     * @param string                      $id
+     * @param Request                     $request
+     * @param FormFactoryInterface        $formFactory
+     * @param UrlGeneratorInterface       $urlGenerator
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService $personneFactory
+     * @param PersonneService             $personneFactory
      *
      * @return array|RedirectResponse
      */
@@ -126,7 +126,7 @@ class AbsenceController
         try {
             $personne = $personneRepository->get($email);
             $absence = $personne->getAbsence($id);
-        } catch (PersonneNotFoundException|AbsenceNotFoundException $e) {
+        } catch (PersonneNotFoundException | AbsenceNotFoundException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -139,22 +139,22 @@ class AbsenceController
                 $personneFactory->modifierAbsence($personne, $modifierAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceDatesInvalidesException|AbsenceAlreadyTakenException|AbsenceJoursDisponiblesInsuffisantsException $e) {
+            } catch (AbsenceDatesInvalidesException | AbsenceAlreadyTakenException | AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
 
         return [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ];
     }
 
     /**
      * @Route("/absence/annuler/{email}/{id}", name="personne_absence_annuler")
      *
-     * @param string $email
-     * @param string $id
-     * @param UrlGeneratorInterface $urlGenerator
+     * @param string                      $email
+     * @param string                      $id
+     * @param UrlGeneratorInterface       $urlGenerator
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse
@@ -164,7 +164,7 @@ class AbsenceController
         try {
             $personne = $personneRepository->get($email);
             $absence = $personne->getAbsence($id);
-        } catch (PersonneNotFoundException|AbsenceNotFoundException $e) {
+        } catch (PersonneNotFoundException | AbsenceNotFoundException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -177,7 +177,7 @@ class AbsenceController
      * @Route("/compteurs/jours_disponibles/{email}", name="personne_compteurs_jours_disponibles")
      * @Template()
      *
-     * @param string $email
+     * @param string                      $email
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse

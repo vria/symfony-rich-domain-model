@@ -41,8 +41,8 @@ class PersonneModifierCommand extends Command
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService $personneService
-     * @param ValidatorInterface $validator
+     * @param PersonneService             $personneService
+     * @param ValidatorInterface          $validator
      */
     public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
     {
@@ -54,16 +54,17 @@ class PersonneModifierCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setDescription("Modifier les données d'une personne.")
-            ->addArgument('email', InputArgument::REQUIRED);
+            ->addArgument('email', InputArgument::REQUIRED)
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -92,7 +93,7 @@ class PersonneModifierCommand extends Command
         $constraintViolationList = $this->validator->validate($personneUpdateDTO);
         if ($constraintViolationList->count() > 0) {
             foreach ($constraintViolationList as $violation) {
-                /** @var $violation ConstraintViolationInterface */
+                /* @var $violation ConstraintViolationInterface */
                 $output->writeln(sprintf('<error>%s: %s</error>', $violation->getPropertyPath(), $violation->getMessage()));
             }
 

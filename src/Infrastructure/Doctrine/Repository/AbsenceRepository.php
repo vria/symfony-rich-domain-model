@@ -8,19 +8,18 @@ use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
 /**
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  *
  * @internal
- *   Une répositoire qui peut être utilisée seulement dans @see Personne aggregate.
+ *   Une répositoire qui peut être utilisée seulement dans @see Personne aggregate
  */
 class AbsenceRepository extends ServiceEntityRepository implements AbsenceRepositoryInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -28,7 +27,7 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function save(Absence $absence): void
     {
@@ -37,7 +36,7 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function absenceDeposeDansPeriode(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool
     {
@@ -48,18 +47,20 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
             ->andWhere(':debut <= a.fin')
             ->setParameter('debut', $debut)
             ->setParameter('fin', $fin)
-            ->setParameter('personne', $personne);
+            ->setParameter('personne', $personne)
+        ;
 
         if ($exclude) {
             $qb->andWhere('a != :exclude')
-                ->setParameter('exclude', $exclude);
+                ->setParameter('exclude', $exclude)
+            ;
         }
 
         return $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function absenceDeposePourDate(Personne $personne, \DateTimeImmutable $date, array $types)
     {
@@ -71,13 +72,14 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
             ->andWhere('a.type in (:types)')
             ->setParameter('personne', $personne)
             ->setParameter('debut', $date)
-            ->setParameter('types', $types);
+            ->setParameter('types', $types)
+        ;
 
-        return intval($qb->getQuery()->getSingleScalarResult()) > 0;
+        return (int) ($qb->getQuery()->getSingleScalarResult()) > 0;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAbsence(Personne $personne, $id)
     {
@@ -88,14 +90,15 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
                 ->setParameter('id', $id)
                 ->setParameter('personne', $personne)
                 ->getQuery()
-                ->getSingleResult();
+                ->getSingleResult()
+            ;
         } catch (NoResultException $e) {
             throw new AbsenceNotFoundException('Absence n\'est pas trouvée');
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAbsences(Personne $personne, \DateTimeImmutable $startPeriod, \DateTimeImmutable $endPeriod)
     {
@@ -109,11 +112,12 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
             ->setParameter('personne', $personne)
             ->orderBy('a.debut', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function annuler(Absence $absence)
     {

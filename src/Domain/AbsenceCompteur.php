@@ -53,23 +53,24 @@ class AbsenceCompteur
 
     /**
      * @var AbsenceType
+     *
      * @see AbsenceType::COMPTEUR
      */
     private $type;
 
     /**
-     * @var integer
+     * @var int
      */
     private $joursDisponibles = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private $joursTravailles = 0;
 
     /**
      * @param Personne $personne
-     * @param int $type
+     * @param int      $type
      */
     public function __construct(Personne $personne, int $type)
     {
@@ -106,10 +107,10 @@ class AbsenceCompteur
      */
     public function incrementerJoursTravailles()
     {
-        $this->joursTravailles++;
+        ++$this->joursTravailles;
         if ($this->joursTravailles >= self::PERIODE_INCREMENTER_COMPTEURS[$this->type->getType()]) {
             $this->joursTravailles = 0;
-            $this->joursDisponibles++;
+            ++$this->joursDisponibles;
         }
     }
 

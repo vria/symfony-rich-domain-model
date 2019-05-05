@@ -2,8 +2,8 @@
 
 namespace App\Application\Service;
 
-use App\Application\DTO\DeposerAbsenceDTO;
 use App\Application\DTO\CreerPersonneDTO;
+use App\Application\DTO\DeposerAbsenceDTO;
 use App\Application\DTO\ModifierAbsenceDTO;
 use App\Domain\Absence;
 use App\Domain\Exception\AbsenceAlreadyTakenException;
@@ -67,7 +67,7 @@ class PersonneService
     /**
      * Modifier les données d'une personne.
      *
-     * @param Personne $personne
+     * @param Personne         $personne
      * @param CreerPersonneDTO $personneUpdateDTO
      */
     public function update(Personne $personne, CreerPersonneDTO $personneUpdateDTO)
@@ -80,7 +80,7 @@ class PersonneService
     /**
      * Déposer une absence.
      *
-     * @param Personne $personne
+     * @param Personne          $personne
      * @param DeposerAbsenceDTO $deposerAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException
@@ -99,7 +99,7 @@ class PersonneService
     }
 
     /**
-     * @param Personne $personne
+     * @param Personne           $personne
      * @param ModifierAbsenceDTO $modifierAbsenceDTO
      *
      * @throws AbsenceAlreadyTakenException

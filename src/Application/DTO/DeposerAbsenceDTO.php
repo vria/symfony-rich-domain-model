@@ -6,7 +6,8 @@ use App\Domain\Absence;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Objet de transfert de données pour:
+ * Objet de transfert de données pour:.
+ *
  * @see \App\Application\Controller\PersonneController::deposerAbsence()
  * @see \App\Application\Service\PersonneService::deposerAbsence()
  * @see \App\Application\Form\DeposerAbsenceType
@@ -20,13 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class DeposerAbsenceDTO
 {
-    /**
-     * L'email d'une personne n'est pas modifiable lors du dépôt d'absence.
-     *
-     * @var string
-     */
-    private $email;
-
     /**
      * @var int
      *
@@ -47,6 +41,12 @@ class DeposerAbsenceDTO
      * @Assert\NotNull()
      */
     public $fin;
+    /**
+     * L'email d'une personne n'est pas modifiable lors du dépôt d'absence.
+     *
+     * @var string
+     */
+    private $email;
 
     /**
      * @param string $email
@@ -59,7 +59,7 @@ class DeposerAbsenceDTO
     }
 
     /**
-     * @param string $email
+     * @param string  $email
      * @param Absence $absence
      *
      * @return static

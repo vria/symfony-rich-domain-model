@@ -10,7 +10,7 @@ use App\Domain\Personne;
  * Le repository pour l'entité @see Absence.
  *
  * @internal
- *   Une répositoire qui peut être utilisée seulement dans @see Personne aggregate.
+ *   Une répositoire qui peut être utilisée seulement dans @see Personne aggregate
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
@@ -26,7 +26,7 @@ interface AbsenceRepositoryInterface
     /**
      * Vérifier s'il existe déjà une absence qui chevauche les dates fournies.
      *
-     * @param Personne $personne
+     * @param Personne           $personne
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      * @param $exclude = null
@@ -36,9 +36,9 @@ interface AbsenceRepositoryInterface
     public function absenceDeposeDansPeriode(Personne $personne, \DateTimeImmutable $debut, \DateTimeImmutable $fin, $exclude = null): bool;
 
     /**
-     * @param Personne $personne
+     * @param Personne           $personne
      * @param \DateTimeImmutable $date
-     * @param array $types
+     * @param array              $types
      *
      * @return bool
      */
@@ -48,14 +48,14 @@ interface AbsenceRepositoryInterface
      * @param Personne $personne
      * @param $id
      *
-     * @return Absence
-     *
      * @throws AbsenceNotFoundException
+     *
+     * @return Absence
      */
     public function getAbsence(Personne $personne, $id);
 
     /**
-     * @param Personne $personne
+     * @param Personne           $personne
      * @param \DateTimeImmutable $startPeriod
      * @param \DateTimeImmutable $endPeriod
      *

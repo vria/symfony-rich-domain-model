@@ -3,8 +3,8 @@
 namespace App\Domain\Service;
 
 use App\Domain\Absence;
-use App\Domain\AbsenceType;
 use App\Domain\AbsenceCompteur;
+use App\Domain\AbsenceType;
 use App\Domain\DTO\CompteurInfoDTO;
 use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
 use App\Domain\Personne;
@@ -44,15 +44,15 @@ class AbsenceCompteurService
     }
 
     /**
-     * @param AbsenceCompteur[] $compteurs
-     * @param Personne $personne
+     * @param AbsenceCompteur[]  $compteurs
+     * @param Personne           $personne
      * @param \DateTimeImmutable $date
      */
     public function incrementerJoursTravailles($compteurs, Personne $personne, \DateTimeImmutable $date): void
     {
         if ($this->absenceRepository->absenceDeposePourDate($personne, $date, AbsenceCompteur::TYPES_ABSENT)) {
             return;
-        };
+        }
 
         foreach ($compteurs as $compteur) {
             if (!self::typeCompteurs($compteur->getType())) {
@@ -64,8 +64,8 @@ class AbsenceCompteurService
     }
 
     /**
-     * @param AbsenceCompteur[] $compteurs
-     * @param AbsenceType $type
+     * @param AbsenceCompteur[]  $compteurs
+     * @param AbsenceType        $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
@@ -87,7 +87,7 @@ class AbsenceCompteurService
 
     /**
      * @param AbsenceCompteur[] $compteurs
-     * @param Absence $absence
+     * @param Absence           $absence
      */
     public function annulerAbsence($compteurs, Absence $absence): void
     {
@@ -106,9 +106,9 @@ class AbsenceCompteurService
     }
 
     /**
-     * @param AbsenceCompteur[] $compteurs
-     * @param Absence $absence
-     * @param AbsenceType $type
+     * @param AbsenceCompteur[]  $compteurs
+     * @param Absence            $absence
+     * @param AbsenceType        $type
      * @param \DateTimeImmutable $debut
      * @param \DateTimeImmutable $fin
      *
@@ -145,7 +145,7 @@ class AbsenceCompteurService
      */
     private function calculerJoursAbsence(\DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
-        return intval($fin->diff($debut)->days) + 1;
+        return (int) ($fin->diff($debut)->days) + 1;
     }
 
     /**
@@ -155,6 +155,6 @@ class AbsenceCompteurService
      */
     private function typeCompteurs(AbsenceType $type)
     {
-        return in_array($type->getType(), AbsenceCompteur::TYPES_COMPTEUR);
+        return \in_array($type->getType(), AbsenceCompteur::TYPES_COMPTEUR, true);
     }
 }

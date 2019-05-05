@@ -19,14 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CreerPersonneType extends AbstractType
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'disabled' => $options['edit']
+                'disabled' => $options['edit'],
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
@@ -35,7 +35,7 @@ class CreerPersonneType extends AbstractType
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {

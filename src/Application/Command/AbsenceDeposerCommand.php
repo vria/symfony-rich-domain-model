@@ -43,8 +43,8 @@ class AbsenceDeposerCommand extends Command
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService $personneService
-     * @param ValidatorInterface $validator
+     * @param PersonneService             $personneService
+     * @param ValidatorInterface          $validator
      */
     public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
     {
@@ -56,17 +56,18 @@ class AbsenceDeposerCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setDescription("Déposer une absence.")
+        $this->setDescription('Déposer une absence.')
             ->setHelp("Il n'est pas possible de déposer une absence qui chevauche une absence déjà existante.")
-            ->addArgument('email', InputArgument::REQUIRED, "L'email d'une personne");
+            ->addArgument('email', InputArgument::REQUIRED, "L'email d'une personne")
+        ;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -98,7 +99,7 @@ class AbsenceDeposerCommand extends Command
         $constraintViolationList = $this->validator->validate($personneUpdateDTO);
         if ($constraintViolationList->count() > 0) {
             foreach ($constraintViolationList as $violation) {
-                /** @var $violation ConstraintViolationInterface */
+                /* @var $violation ConstraintViolationInterface */
                 $output->writeln(sprintf('<error>%s: %s</error>', $violation->getPropertyPath(), $violation->getMessage()));
             }
 

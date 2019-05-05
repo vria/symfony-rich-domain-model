@@ -24,9 +24,9 @@ interface PersonneRepositoryInterface
      *
      * @param string $email
      *
-     * @return Personne
-     *
      * @throws PersonneNotFoundException
+     *
+     * @return Personne
      */
     public function get(string $email): Personne;
 
