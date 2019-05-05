@@ -4,7 +4,7 @@ Modèle de domaine riche dans l'app Symfony
 [![Build Status](https://travis-ci.org/vria/symfony-rich-domain-model.svg?branch=master)](https://travis-ci.org/vria/symfony-rich-domain-model)
 [![codecov](https://codecov.io/gh/vria/symfony-rich-domain-model/branch/master/graph/badge.svg)](https://codecov.io/gh/vria/symfony-rich-domain-model)
 
-Domaine:
+### Domaine
 
 - Entités:
   - [Personne]
@@ -29,6 +29,30 @@ Domaine:
   - [AbsenceNotFoundException]
 
 Veuillez regarder les commentaires dans les fichiers sources.
+
+
+### Lancer l'application
+
+Créer la bdd:
+```bash
+php bin/console doctrine:database:create
+```
+
+Mettre à jour le schema de la bdd:
+```bash
+php bin/console doctrine:schema:update --force
+```
+
+Charger les données de tests:
+```bash
+php bin/console doctrine:fixtures:load --env=test
+```
+
+Lancer les tests *sans changer les données dans la bdd*: 
+```bash
+vendor/bin/phpunit
+```
+
 
 [Personne]: src/Domain/Personne.php
 [Absence]: src/Domain/Absence.php
