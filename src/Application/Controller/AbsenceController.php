@@ -161,16 +161,14 @@ class AbsenceController
      *
      * @return array|RedirectResponse
      */
-    public function supprimer(string $email, string $id, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository)
+    public function annuler(string $email, string $id, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository)
     {
         try {
             $personne = $personneRepository->get($email);
-            $absence = $personne->getAbsence($id);
+            $personne->annulerAbsence($id);
         } catch (PersonneNotFoundException | AbsenceNotFoundException $e) {
             throw new NotFoundHttpException();
         }
-
-        $personne->annulerAbsence($absence);
 
         return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
     }

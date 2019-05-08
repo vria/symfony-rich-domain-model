@@ -6,6 +6,7 @@ use App\Application\DTO\PersonneCreerDTO;
 use App\Application\Service\PersonneService;
 use App\Domain\Exception\PersonneEmailAlreadyTakenException;
 use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,26 +31,19 @@ class PersonneModifierCommand extends Command
     private $personneRepository;
 
     /**
-     * @var PersonneService
-     */
-    private $personneSerivce;
-
-    /**
      * @var ValidatorInterface
      */
     private $validator;
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService             $personneService
      * @param ValidatorInterface          $validator
      */
-    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
+    public function __construct(PersonneRepositoryInterface $personneRepository, ValidatorInterface $validator)
     {
         parent::__construct();
 
         $this->personneRepository = $personneRepository;
-        $this->personneSerivce = $personneService;
         $this->validator = $validator;
     }
 
@@ -70,39 +64,28 @@ class PersonneModifierCommand extends Command
     {
         try {
             // Récupérer une personne demandée.
-            $personnne = $this->personneRepository->get($input->getArgument('email'));
+            $personne = $this->personneRepository->get($input->getArgument('email'));
+            /** @var Personne $personne */
         } catch (PersonneNotFoundException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 
             return;
         }
 
-        // Construire DTO.
-        $personneUpdateDTO = PersonneCreerDTO::fromPerson($personnne);
-
         // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');
 
-        $question = new Question('Email: ', $personneUpdateDTO->email);
-        $personneUpdateDTO->email = $helper->ask($input, $output, $question);
+        $question = new Question('Nom: ', $personne->getNom());
+        $nom = $helper->ask($input, $output, $question);
 
-        $question = new Question('Nom: ', $personneUpdateDTO->nom);
-        $personneUpdateDTO->nom = $helper->ask($input, $output, $question);
+        $this->validator->validate($nom, [
 
-        // Valider la saisie de l'utilisateur
-        $constraintViolationList = $this->validator->validate($personneUpdateDTO);
-        if ($constraintViolationList->count() > 0) {
-            foreach ($constraintViolationList as $violation) {
-                /* @var $violation ConstraintViolationInterface */
-                $output->writeln(sprintf('<error>%s: %s</error>', $violation->getPropertyPath(), $violation->getMessage()));
-            }
-
-            return;
-        }
+        ]);
 
         try {
             // Modifier une personne.
-            $this->personneSerivce->update($personnne, $personneUpdateDTO);
+            $personne->update($nom);
+            $this->personneRepository->save($personne);
 
             $output->writeln('<info>Personne a été modifiée avec succès.</info>');
         } catch (PersonneEmailAlreadyTakenException $e) {

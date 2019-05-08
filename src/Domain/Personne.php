@@ -35,6 +35,7 @@ class Personne
     /**
      * Email.
      * C'est l'identifiant d'une personne.
+     * Une fois créée la personne ne pourra pas changer son email.
      *
      * @var string
      */
@@ -174,10 +175,13 @@ class Personne
     }
 
     /**
-     * @param Absence $absence
+     * @param $id
+     *
+     * @throws AbsenceNotFoundException
      */
-    public function annulerAbsence(Absence $absence)
+    public function annulerAbsence($id)
     {
+        $absence = $this->getAbsence($id);
         $this->absenceRepository->annuler($absence);
         $this->absenceCompteurService->annulerAbsence($this->compteursAbsence, $absence);
     }

@@ -36,6 +36,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
+     * Implementation de @see PersonneRepositoryInterface::get().
      * {@inheritdoc}
      */
     public function get(string $email): Personne
@@ -49,6 +50,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
+     * Implementation de @see PersonneRepositoryInterface::save().
      * {@inheritdoc}
      */
     public function save(Personne $personne): void
@@ -58,6 +60,7 @@ class PersonneRepository extends ServiceEntityRepository implements PersonneRepo
     }
 
     /**
+     * Implementation de @see PersonneRepositoryInterface::emailAlreadyExist().
      * {@inheritdoc}
      */
     public function emailAlreadyExist(string $email): bool

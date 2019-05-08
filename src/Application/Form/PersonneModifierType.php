@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Formulaire pour modifier une personne.
@@ -31,6 +32,9 @@ class PersonneModifierType extends AbstractType implements DataMapperInterface
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
             ])
             ->setDataMapper($this)
         ;
@@ -58,6 +62,8 @@ class PersonneModifierType extends AbstractType implements DataMapperInterface
         $forms = iterator_to_array($forms);
 
         /* @var Personne $personne */
-        $personne->update($forms['nom']->getData());
+        if ($nom = $forms['nom']->getData()) {
+            $personne->update($nom);
+        }
     }
 }

@@ -44,8 +44,6 @@ class PersonneLifecycleListener implements EventSubscriber
     }
 
     /**
-     * @ORM\PostLoad()
-     *
      * @var LifecycleEventArgs
      */
     public function postLoad(LifecycleEventArgs $event)
