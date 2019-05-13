@@ -3,10 +3,10 @@
 namespace App\Domain\Exception;
 
 /**
- * Personne n'est pas trouvée.
+ * Absence n'est pas trouvée.
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class PersonneNotFoundException extends \Exception
+class AbsenceNonTrouveeException extends \Exception
 {
 }

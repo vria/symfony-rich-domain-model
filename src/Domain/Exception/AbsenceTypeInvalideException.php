@@ -8,6 +8,6 @@ namespace App\Domain\Exception;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class AbsenceTypeInvalidException extends \InvalidArgumentException
+class AbsenceTypeInvalideException extends \InvalidArgumentException
 {
 }

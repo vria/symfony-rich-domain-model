@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\DTO;
+namespace App\Domain\DTO;
 
 use App\Domain\Personne;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -9,8 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Objet de transfert de données pour:.
  *
  * @see \App\Application\Controller\PersonneController::createPerson()
- * @see \App\Application\Service\PersonneService::create()
  * @see \App\Application\Form\PersonneCreerType
+ * @see \App\Domain\Factory\PersonneFactory::create()
  *
  * Les champs de cet objet sont validés lors de soumission du formulaire.
  *
@@ -35,19 +35,4 @@ class PersonneCreerDTO
      * @Assert\NotBlank()
      */
     public $nom;
-
-    /**
-     * @param Personne $personne
-     *
-     * @return static
-     */
-    public static function fromPerson(Personne $personne)
-    {
-        $dto = new static();
-
-        $dto->email = $personne->getEmail();
-        $dto->nom = $personne->getNom();
-
-        return $dto;
-    }
 }

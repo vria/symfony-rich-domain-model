@@ -7,6 +7,6 @@ namespace App\Domain\Exception;
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
-class PersonneEmailAlreadyTakenException extends \InvalidArgumentException
+class PersonneEmailDejaEnregistreException extends \InvalidArgumentException
 {
 }

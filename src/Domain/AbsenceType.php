@@ -2,7 +2,7 @@
 
 namespace App\Domain;
 
-use App\Domain\Exception\AbsenceTypeInvalidException;
+use App\Domain\Exception\AbsenceTypeInvalideException;
 
 /**
  * Type d'absence.
@@ -31,12 +31,12 @@ class AbsenceType
     /**
      * @param int $type
      *
-     * @throws AbsenceTypeInvalidException
+     * @throws AbsenceTypeInvalideException
      */
     public function __construct(int $type)
     {
         if (!\in_array($type, [self::MALADIE, self::CONGES_PAYES, self::TELETRAVAIL], true)) {
-            throw new AbsenceTypeInvalidException("Type d'absence inconnu");
+            throw new AbsenceTypeInvalideException("Type d'absence inconnu");
         }
 
         $this->type = $type;

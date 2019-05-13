@@ -2,7 +2,7 @@
 
 namespace App\Domain\Repository;
 
-use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\Exception\PersonneNonTrouveeException;
 use App\Domain\Personne;
 
 /**
@@ -24,7 +24,7 @@ interface PersonneRepositoryInterface
      *
      * @param string $email
      *
-     * @throws PersonneNotFoundException
+     * @throws PersonneNonTrouveeException
      *
      * @return Personne
      */

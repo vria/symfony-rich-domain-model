@@ -55,11 +55,9 @@ class AbsenceCompteurService
         }
 
         foreach ($compteurs as $compteur) {
-            if (!self::typeCompteurs($compteur->getType())) {
-                return;
+            if (self::typeCompteurs($compteur->getType())) {
+                $compteur->incrementerJoursTravailles();
             }
-
-            $compteur->incrementerJoursTravailles();
         }
     }
 

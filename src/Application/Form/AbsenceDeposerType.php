@@ -2,8 +2,8 @@
 
 namespace App\Application\Form;
 
-use App\Application\DTO\AbsenceDeposerDTO;
 use App\Domain\AbsenceType;
+use App\Domain\DTO\AbsenceDeposerDTO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;

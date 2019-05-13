@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Domain;
 
 use App\Domain\Absence;
 use App\Domain\AbsenceType;
+use App\Domain\DTO\AbsenceDeposerDTO;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use App\Domain\Service\AbsenceCompteurService;
@@ -33,7 +34,7 @@ class PersonneTest extends TestCase
     /**
      * Le constructeur de @see Personne lève une exception si l'email est déjà pris.
      *
-     * @expectedException \App\Domain\Exception\PersonneEmailAlreadyTakenException
+     * @expectedException \App\Domain\Exception\PersonneEmailDejaEnregistreException
      */
     public function testThrowsEmailAlreadyTakenException()
     {
@@ -89,7 +90,7 @@ class PersonneTest extends TestCase
         $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
         $personne = new Personne('', 'Rick', $personneRepository, $absenceRepository, $absenceCompteurService);
-        $personne->update('Richard');
+        $personne->renommer('Richard');
 
         $this->assertEquals('Richard', $personne->getNom());
     }
@@ -99,9 +100,9 @@ class PersonneTest extends TestCase
      * déjà pour des dates passées selon
      * @see AbsenceRepository::absenceDeposeDansPeriode().
      *
-     * @expectedException \App\Domain\Exception\AbsenceAlreadyTakenException
+     * @expectedException \App\Domain\Exception\AbsenceDejaDeposeeException
      */
-    public function testDeposerAbsenceThrowsAbsenceAlreadyTakenException()
+    public function testDeposerAbsenceThrowsAbsenceDejaDeposeeException()
     {
         $personneRepository = $this->createMock(PersonneRepositoryInterface::class);
         $personneRepository->method('emailAlreadyExist')->willReturn(false);
@@ -110,7 +111,13 @@ class PersonneTest extends TestCase
         $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
         $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
-        $personne->deposerAbsence(AbsenceType::MALADIE, new \DateTimeImmutable(), new \DateTimeImmutable());
+
+        $dto = new AbsenceDeposerDTO();
+        $dto->type = AbsenceType::MALADIE;
+        $dto->debut = new \DateTimeImmutable();
+        $dto->fin = new \DateTimeImmutable();
+
+        $personne->deposerAbsence($dto);
     }
 
     /**
@@ -131,7 +138,12 @@ class PersonneTest extends TestCase
         $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
 
         $dateAbsence = new \DateTimeImmutable('2019-04-24 15:00:00');
-        $personne->deposerAbsence(AbsenceType::MALADIE, $dateAbsence, $dateAbsence);
+        $dto = new AbsenceDeposerDTO();
+        $dto->type = AbsenceType::MALADIE;
+        $dto->debut = $dateAbsence;
+        $dto->fin = $dateAbsence;
+
+        $personne->deposerAbsence($dto);
     }
 
     /**
@@ -164,6 +176,10 @@ class PersonneTest extends TestCase
         $absenceCompteurService = $this->createMock(AbsenceCompteurService::class);
 
         $personne = new Personne('', '', $personneRepository, $absenceRepository, $absenceCompteurService);
-        $personne->deposerAbsence(AbsenceType::MALADIE, $debut, $fin);
+        $dto = new AbsenceDeposerDTO();
+        $dto->type = AbsenceType::MALADIE;
+        $dto->debut = $debut;
+        $dto->fin = $fin;
+        $personne->deposerAbsence($dto);
     }
 }

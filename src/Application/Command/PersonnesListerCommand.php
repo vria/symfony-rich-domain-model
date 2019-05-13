@@ -51,7 +51,7 @@ class PersonnesListerCommand extends Command
         $table->setHeaders(['Email', 'Nom']);
 
         foreach ($personnes as $personne) {
-            $table->addRow([$personne->getEmail(), $personne->getNom()]);
+            $table->addRow([$personne['email'], $personne['nom']]);
         }
 
         $table->render();

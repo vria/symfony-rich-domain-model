@@ -2,9 +2,11 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\PersonneCreerDTO;
-use App\Application\Service\PersonneService;
-use App\Domain\Exception\PersonneEmailAlreadyTakenException;
+use App\Domain\DTO\PersonneCreerDTO;
+use App\Domain\Exception\PersonneEmailDejaEnregistreException;
+use App\Domain\Factory\PersonneFactory;
+use App\Domain\Repository\AbsenceRepositoryInterface;
+use App\Domain\Repository\PersonneRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,25 +24,32 @@ class PersonneCreerCommand extends Command
     protected static $defaultName = 'app:personne:creer';
 
     /**
-     * @var PersonneService
-     */
-    private $personneService;
-
-    /**
      * @var ValidatorInterface
      */
     private $validator;
 
     /**
-     * @param PersonneService    $personneService
-     * @param ValidatorInterface $validator
+     * @var PersonneRepositoryInterface
      */
-    public function __construct(PersonneService $personneService, ValidatorInterface $validator)
+    private $personneRepository;
+
+    /**
+     * @var AbsenceRepositoryInterface
+     */
+    private $absenceRepository;
+
+    /**
+     * @param ValidatorInterface $validator
+     * @param PersonneRepositoryInterface $personneRepository
+     * @param AbsenceRepositoryInterface $absenceRepository
+     */
+    public function __construct(ValidatorInterface $validator, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
     {
         parent::__construct();
 
-        $this->personneService = $personneService;
         $this->validator = $validator;
+        $this->personneRepository = $personneRepository;
+        $this->absenceRepository = $absenceRepository;
     }
 
     /**
@@ -77,10 +86,12 @@ class PersonneCreerCommand extends Command
 
         try {
             // Créer une personne.
-            $this->personneService->create($creerPersonneDTO);
+            $personneFactory = new PersonneFactory($this->personneRepository, $this->absenceRepository);
+            $personne = $personneFactory->create($creerPersonneDTO);
+            $this->personneRepository->save($personne);
 
             $output->writeln('<info>Personne a été créée avec succès.</info>');
-        } catch (PersonneEmailAlreadyTakenException $e) {
+        } catch (PersonneEmailDejaEnregistreException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }

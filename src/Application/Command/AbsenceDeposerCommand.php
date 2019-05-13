@@ -2,11 +2,10 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\AbsenceDeposerDTO;
-use App\Application\Service\PersonneService;
 use App\Domain\AbsenceType;
-use App\Domain\Exception\AbsenceAlreadyTakenException;
-use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\DTO\AbsenceDeposerDTO;
+use App\Domain\Exception\AbsenceDejaDeposeeException;
+use App\Domain\Exception\PersonneNonTrouveeException;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,26 +31,19 @@ class AbsenceDeposerCommand extends Command
     private $personneRepository;
 
     /**
-     * @var PersonneService
-     */
-    private $personneService;
-
-    /**
      * @var ValidatorInterface
      */
     private $validator;
 
     /**
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService             $personneService
      * @param ValidatorInterface          $validator
      */
-    public function __construct(PersonneRepositoryInterface $personneRepository, PersonneService $personneService, ValidatorInterface $validator)
+    public function __construct(PersonneRepositoryInterface $personneRepository, ValidatorInterface $validator)
     {
         parent::__construct();
 
         $this->personneRepository = $personneRepository;
-        $this->personneService = $personneService;
         $this->validator = $validator;
     }
 
@@ -74,29 +66,29 @@ class AbsenceDeposerCommand extends Command
         try {
             // Récupérer une personne demandée.
             $personnne = $this->personneRepository->get($input->getArgument('email'));
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 
             return;
         }
 
         // Construire DTO.
-        $personneUpdateDTO = new AbsenceDeposerDTO($personnne->getEmail());
+        $absenceDeposerDTO = new AbsenceDeposerDTO();
 
         // Demander l'utilisateur à entrer les nouvelles valeurs.
         $helper = $this->getHelper('question');
 
-        $question = new Question("Date de début d'absence :", $personneUpdateDTO->debut->format('Y-m-d'));
-        $personneUpdateDTO->debut = new \DateTimeImmutable($helper->ask($input, $output, $question));
+        $question = new Question("Date de début d'absence :", $absenceDeposerDTO->debut->format('Y-m-d'));
+        $absenceDeposerDTO->debut = new \DateTimeImmutable($helper->ask($input, $output, $question));
 
-        $question = new Question("Date de fin d'absence :", $personneUpdateDTO->fin->format('Y-m-d'));
-        $personneUpdateDTO->fin = new \DateTimeImmutable($helper->ask($input, $output, $question));
+        $question = new Question("Date de fin d'absence :", $absenceDeposerDTO->fin->format('Y-m-d'));
+        $absenceDeposerDTO->fin = new \DateTimeImmutable($helper->ask($input, $output, $question));
 
         $question = new ChoiceQuestion("Type d'absence :", [AbsenceType::MALADIE => AbsenceType::MALADIE, AbsenceType::CONGES_PAYES => AbsenceType::CONGES_PAYES]);
-        $personneUpdateDTO->type = $helper->ask($input, $output, $question);
+        $absenceDeposerDTO->type = $helper->ask($input, $output, $question);
 
         // Valider la saisie de l'utilisateur
-        $constraintViolationList = $this->validator->validate($personneUpdateDTO);
+        $constraintViolationList = $this->validator->validate($absenceDeposerDTO);
         if ($constraintViolationList->count() > 0) {
             foreach ($constraintViolationList as $violation) {
                 /* @var $violation ConstraintViolationInterface */
@@ -108,10 +100,10 @@ class AbsenceDeposerCommand extends Command
 
         try {
             // Déposer une absence.
-            $this->personneService->deposerAbsence($personnne, $personneUpdateDTO);
+            $personnne->deposerAbsence($absenceDeposerDTO);
 
             $output->writeln('<info>Absence a été déposée avec succès.</info>');
-        } catch (AbsenceAlreadyTakenException $e) {
+        } catch (AbsenceDejaDeposeeException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }

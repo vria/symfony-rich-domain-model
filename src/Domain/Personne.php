@@ -2,13 +2,15 @@
 
 namespace App\Domain;
 
+use App\Domain\DTO\AbsenceDeposerDTO;
+use App\Domain\DTO\AbsenceModifierDTO;
 use App\Domain\DTO\CompteurInfoDTO;
-use App\Domain\Exception\AbsenceAlreadyTakenException;
+use App\Domain\Exception\AbsenceDejaDeposeeException;
 use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
-use App\Domain\Exception\AbsenceNotFoundException;
-use App\Domain\Exception\AbsenceTypeInvalidException;
-use App\Domain\Exception\PersonneEmailAlreadyTakenException;
+use App\Domain\Exception\AbsenceNonTrouveeException;
+use App\Domain\Exception\AbsenceTypeInvalideException;
+use App\Domain\Exception\PersonneEmailDejaEnregistreException;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use App\Domain\Service\AbsenceCompteurService;
@@ -16,15 +18,18 @@ use App\Domain\Service\AbsenceCompteurService;
 /**
  * Une personne.
  *
- * Cette classe est une *entité* et la racine d'un agrégat englobant @see Absence.
+ * Cette classe est une *entité* et la racine d'un agrégat englobant :
+ * - @see Absence
+ * - @see AbsenceCompteur
+ *
  * Il existe un repository pour cette classe @see PersonneRepositoryInterface.
- * Il est conseillé que seules les racines des agrégats aient le repositories.
+ * Il est conseillé que seules les racines des agrégats aient le repositories
+ * accessibles depuis l'exterieur de l'agrégat.
  *
  * Un nouveau objet de cette classe peut être instancié seulement dans deux cas :
- * - création d'une nouvelle personne dans @see \App\Application\Service\PersonneService::create().
+ * - création d'une nouvelle personne dans @see \App\Domain\Factory\PersonneFactory::create().
  *   Dans ce cas le @see Personne::__construct() est appelé.
  * - reconstitution d'une personne de la bdd par
- *
  *   @see \App\Infrastructure\Doctrine\Repository\PersonneRepository::get().
  *   Doctrine utilise la réflexion pour intitialiser les champs sans appeler le constructeur.
  *
@@ -84,12 +89,11 @@ class Personne
     {
         // Vérifier que l'email n'est pas encore enregistré.
         if ($personneRepository->emailAlreadyExist($email)) {
-            throw new PersonneEmailAlreadyTakenException($email.' a été déjà enregistré');
+            throw new PersonneEmailDejaEnregistreException($email.' a été déjà enregistré');
         }
 
         $this->email = $email;
         $this->nom = $nom;
-        $this->compteursAbsence = $absenceCompteurService->init($this);
         $this->personneRepository = $personneRepository;
         $this->absenceRepository = $absenceRepository;
         $this->absenceCompteurService = $absenceCompteurService;
@@ -116,7 +120,7 @@ class Personne
      *
      * @param string $nom
      */
-    public function update(string $nom)
+    public function renommer(string $nom)
     {
         $this->nom = $nom;
     }
@@ -125,23 +129,45 @@ class Personne
      * Déposer une absence.
      * Il n'est pas possible de déposer une absence qui chevauche une absence déjà existante.
      *
-     * @param int                $type
-     * @param \DateTimeImmutable $debut
-     * @param \DateTimeImmutable $fin
+     * @param AbsenceDeposerDTO $dto
      *
-     * @throws AbsenceAlreadyTakenException
+     * @throws AbsenceDejaDeposeeException
      * @throws AbsenceDatesInvalidesException
-     * @throws AbsenceTypeInvalidException
+     * @throws AbsenceTypeInvalideException
      * @throws AbsenceJoursDisponiblesInsuffisantsException
      */
-    public function deposerAbsence(int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
+    public function deposerAbsence(AbsenceDeposerDTO $dto)
     {
-        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $debut, $fin)) {
-            throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
+        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $dto->debut, $dto->fin)) {
+            throw new AbsenceDejaDeposeeException('Une absence pour ces dates a été déjà déposée');
         }
 
-        $absence = new Absence($this, $type, $debut, $fin);
-        $this->absenceCompteurService->deposerAbsence($this->compteursAbsence, new AbsenceType($type), $debut, $fin);
+        $absence = new Absence($this, $dto->type, $dto->debut, $dto->fin);
+        $this->absenceCompteurService->deposerAbsence($this->compteursAbsence, new AbsenceType($dto->type), $dto->debut, $dto->fin);
+
+        $this->absenceRepository->save($absence);
+        $this->personneRepository->save($this);
+    }
+
+    /**
+     * @param AbsenceModifierDTO $dto
+     *
+     * @throws AbsenceDejaDeposeeException
+     * @throws AbsenceDatesInvalidesException
+     * @throws AbsenceTypeInvalideException
+     * @throws AbsenceNonTrouveeException
+     * @throws AbsenceJoursDisponiblesInsuffisantsException
+     */
+    public function modifierAbsence(AbsenceModifierDTO $dto)
+    {
+        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $dto->debut, $dto->fin, $dto->getId())) {
+            throw new AbsenceDejaDeposeeException('Une absence pour ces dates a été déjà déposée');
+        }
+
+        $absence = $this->absenceRepository->getAbsence($this, $dto->getId());
+        $this->absenceCompteurService->modifierAbsence($this->compteursAbsence, $absence, new AbsenceType($dto->type), $dto->debut, $dto->fin);
+
+        $absence->modifier($dto->type, $dto->debut, $dto->fin);
 
         $this->absenceRepository->save($absence);
         $this->personneRepository->save($this);
@@ -149,35 +175,8 @@ class Personne
 
     /**
      * @param $id
-     * @param \DateTimeImmutable $debut
-     * @param \DateTimeImmutable $fin
-     * @param int                $type
      *
-     * @throws AbsenceAlreadyTakenException
-     * @throws AbsenceDatesInvalidesException
-     * @throws AbsenceTypeInvalidException
-     * @throws AbsenceNotFoundException
-     * @throws AbsenceJoursDisponiblesInsuffisantsException
-     */
-    public function modifierAbsence($id, \DateTimeImmutable $debut, \DateTimeImmutable $fin, int $type)
-    {
-        if ($this->absenceRepository->absenceDeposeDansPeriode($this, $debut, $fin, $id)) {
-            throw new AbsenceAlreadyTakenException('Une absence pour ces dates a été déjà déposée');
-        }
-
-        $absence = $this->absenceRepository->getAbsence($this, $id);
-        $this->absenceCompteurService->modifierAbsence($this->compteursAbsence, $absence, $absence->getType(), $debut, $fin);
-
-        $absence->modify($type, $debut, $fin);
-
-        $this->absenceRepository->save($absence);
-        $this->personneRepository->save($this);
-    }
-
-    /**
-     * @param $id
-     *
-     * @throws AbsenceNotFoundException
+     * @throws AbsenceNonTrouveeException
      */
     public function annulerAbsence($id)
     {
@@ -200,13 +199,21 @@ class Personne
     /**
      * @param $id
      *
-     * @throws AbsenceNotFoundException
+     * @throws AbsenceNonTrouveeException
      *
      * @return Absence
      */
     public function getAbsence($id)
     {
         return $this->absenceRepository->getAbsence($this, $id);
+    }
+
+    /**
+     * @param array $compteursAbsence
+     */
+    public function reinitialiserComptuers(array $compteursAbsence)
+    {
+        $this->compteursAbsence = $compteursAbsence;
     }
 
     /**

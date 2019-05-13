@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\DTO;
+namespace App\Domain\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -8,7 +8,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Objet de transfert de données pour:.
  *
  * @see \App\Application\Controller\PersonneController::deposerAbsence()
- * @see \App\Application\Service\PersonneService::deposerAbsence()
  * @see \App\Application\Form\AbsenceDeposerType
  *
  * Les champs de cet objet sont validés lors de soumission du formulaire.

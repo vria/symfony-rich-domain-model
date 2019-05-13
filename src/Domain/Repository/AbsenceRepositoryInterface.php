@@ -3,7 +3,7 @@
 namespace App\Domain\Repository;
 
 use App\Domain\Absence;
-use App\Domain\Exception\AbsenceNotFoundException;
+use App\Domain\Exception\AbsenceNonTrouveeException;
 use App\Domain\Personne;
 
 /**
@@ -48,7 +48,7 @@ interface AbsenceRepositoryInterface
      * @param Personne $personne
      * @param $id
      *
-     * @throws AbsenceNotFoundException
+     * @throws AbsenceNonTrouveeException
      *
      * @return Absence
      */

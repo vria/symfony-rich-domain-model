@@ -77,7 +77,7 @@ class Absence
      *
      * @throws AbsenceDatesInvalidesException
      */
-    public function modify(int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
+    public function modifier(int $type, \DateTimeImmutable $debut, \DateTimeImmutable $fin)
     {
         $this->type = new AbsenceType($type);
         $this->setDates($debut, $fin);

@@ -2,10 +2,8 @@
 
 namespace App\Application\Command;
 
-use App\Application\DTO\PersonneCreerDTO;
-use App\Application\Service\PersonneService;
-use App\Domain\Exception\PersonneEmailAlreadyTakenException;
-use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\Exception\PersonneEmailDejaEnregistreException;
+use App\Domain\Exception\PersonneNonTrouveeException;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
@@ -13,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -66,7 +65,7 @@ class PersonneModifierCommand extends Command
             // Récupérer une personne demandée.
             $personne = $this->personneRepository->get($input->getArgument('email'));
             /** @var Personne $personne */
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 
             return;
@@ -79,16 +78,16 @@ class PersonneModifierCommand extends Command
         $nom = $helper->ask($input, $output, $question);
 
         $this->validator->validate($nom, [
-
+            new Assert\NotBlank(),
         ]);
 
         try {
             // Modifier une personne.
-            $personne->update($nom);
+            $personne->renommer($nom);
             $this->personneRepository->save($personne);
 
             $output->writeln('<info>Personne a été modifiée avec succès.</info>');
-        } catch (PersonneEmailAlreadyTakenException $e) {
+        } catch (PersonneEmailDejaEnregistreException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }

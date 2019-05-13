@@ -2,7 +2,7 @@
 
 namespace App\Application\Form;
 
-use App\Application\DTO\PersonneCreerDTO;
+use App\Domain\DTO\PersonneCreerDTO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -31,15 +31,5 @@ class PersonneCreerType extends AbstractType
                 'label' => 'Nom',
             ])
         ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class' => PersonneCreerDTO::class,
-        ]);
     }
 }

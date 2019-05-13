@@ -62,11 +62,11 @@ vendor/bin/phpunit
 [PersonneRepositoryInterface]: src/Domain/Repository/PersonneRepositoryInterface.php
 [AbsenceRepositoryInterface]: src/Domain/Repository/AbsenceRepositoryInterface.php
 [CompteurInfoDTO]: src/Domain/DTO/CompteurInfoDTO.php
-[PersonneNotFoundException]: src/Domain/Exception/PersonneNotFoundException.php
-[PersonneEmailAlreadyTakenException]: src/Domain/Exception/PersonneEmailAlreadyTakenException.php
+[PersonneNotFoundException]: src/Domain/Exception/PersonneNonTrouveeException.php
+[PersonneEmailAlreadyTakenException]: src/Domain/Exception/PersonneEmailDejaEnregistreException.php
 [AbsenceDatesInvalidesException]: src/Domain/Exception/AbsenceDatesInvalidesException.php
 [AbsenceDatesDansLePasseException]: src/Domain/Exception/AbsenceDatesDansLePasseException.php
-[AbsenceTypeInvalidException]: src/Domain/Exception/AbsenceTypeInvalidException.php
-[AbsenceAlreadyTakenException]: src/Domain/Exception/AbsenceAlreadyTakenException.php
+[AbsenceTypeInvalidException]: src/Domain/Exception/AbsenceTypeInvalideException.php
+[AbsenceAlreadyTakenException]: src/Domain/Exception/AbsenceDejaDeposeeException.php
 [AbsenceJoursDisponiblesInsuffisantsException]: src/Domain/Exception/AbsenceJoursDisponiblesInsuffisantsException.php
-[AbsenceNotFoundException]: src/Domain/Exception/AbsenceNotFoundException.php
+[AbsenceNotFoundException]: src/Domain/Exception/AbsenceNonTrouveeException.php

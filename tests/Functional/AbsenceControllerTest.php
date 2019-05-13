@@ -3,8 +3,8 @@
 namespace App\Tests\Functional;
 
 use App\Application\Controller\AbsenceController;
-use App\Application\DTO\AbsenceDeposerDTO;
 use App\Domain\Absence;
+use App\Domain\DTO\AbsenceDeposerDTO;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -163,7 +163,7 @@ class AbsenceControllerTest extends WebTestCase
 
         $this->assertCount(
             1,
-            $crawler->filter('h3:contains("Deposer une absence pour rsanchez@webnet.fr")'),
+            $crawler->filter('h3:contains("Deposer une absence pour Rick")'),
             ''
         );
 
@@ -248,7 +248,7 @@ class AbsenceControllerTest extends WebTestCase
     /**
      * @see AbsenceController::deposer()
      */
-    public function testDeposerAbsenceAlreadyTaken()
+    public function testDeposerAbsenceDejaDeposeeException()
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/absence/deposer/rsanchez@webnet.fr');

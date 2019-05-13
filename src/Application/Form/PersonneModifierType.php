@@ -63,7 +63,7 @@ class PersonneModifierType extends AbstractType implements DataMapperInterface
 
         /* @var Personne $personne */
         if ($nom = $forms['nom']->getData()) {
-            $personne->update($nom);
+            $personne->renommer($nom);
         }
     }
 }

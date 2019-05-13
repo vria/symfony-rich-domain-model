@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Domain\Absence;
-use App\Domain\Exception\AbsenceNotFoundException;
+use App\Domain\Exception\AbsenceNonTrouveeException;
 use App\Domain\Personne;
 use App\Domain\Repository\AbsenceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -93,7 +93,7 @@ class AbsenceRepository extends ServiceEntityRepository implements AbsenceReposi
                 ->getSingleResult()
             ;
         } catch (NoResultException $e) {
-            throw new AbsenceNotFoundException('Absence n\'est pas trouvée');
+            throw new AbsenceNonTrouveeException('Absence n\'est pas trouvée');
         }
     }
 

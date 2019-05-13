@@ -2,13 +2,14 @@
 
 namespace App\Application\Controller;
 
-use App\Application\DTO\PersonneCreerDTO;
 use App\Application\Form\PersonneCreerType;
 use App\Application\Form\PersonneModifierType;
-use App\Application\Service\PersonneService;
-use App\Domain\Exception\PersonneEmailAlreadyTakenException;
-use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\DTO\PersonneCreerDTO;
+use App\Domain\Exception\PersonneEmailDejaEnregistreException;
+use App\Domain\Exception\PersonneNonTrouveeException;
+use App\Domain\Factory\PersonneFactory;
 use App\Domain\Personne;
+use App\Domain\Repository\AbsenceRepositoryInterface;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormError;
@@ -49,14 +50,15 @@ class PersonneController
      * @Route("/personne", name="personne_creer")
      * @Template()
      *
-     * @param Request               $request
-     * @param FormFactoryInterface  $formFactory
+     * @param Request $request
+     * @param FormFactoryInterface $formFactory
      * @param UrlGeneratorInterface $urlGenerator
-     * @param PersonneService       $personneFactory
+     * @param PersonneRepositoryInterface $personneRepository
+     * @param AbsenceRepositoryInterface $absenceRepository
      *
      * @return array|RedirectResponse
      */
-    public function creer(Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneFactory)
+    public function creer(Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository, AbsenceRepositoryInterface $absenceRepository)
     {
         $creerPersonneDTO = new PersonneCreerDTO();
         $form = $formFactory->create(PersonneCreerType::class, $creerPersonneDTO);
@@ -64,10 +66,12 @@ class PersonneController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $personneFactory->create($creerPersonneDTO);
+                $personneFactory = new PersonneFactory($personneRepository, $absenceRepository);
+                $personne = $personneFactory->create($creerPersonneDTO);
+                $personneRepository->save($personne);
 
                 return new RedirectResponse($urlGenerator->generate('personne_lister'));
-            } catch (PersonneEmailAlreadyTakenException $e) {
+            } catch (PersonneEmailDejaEnregistreException $e) {
                 $form->get('email')->addError(new FormError($e->getMessage()));
             }
         }
@@ -95,7 +99,7 @@ class PersonneController
     {
         try {
             $personne = $personneRepository->get($email);
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 

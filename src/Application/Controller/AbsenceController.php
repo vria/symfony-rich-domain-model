@@ -2,15 +2,14 @@
 
 namespace App\Application\Controller;
 
-use App\Application\DTO\AbsenceDeposerDTO;
-use App\Application\DTO\AbsenceModifierDTO;
 use App\Application\Form\AbsenceDeposerType;
-use App\Application\Service\PersonneService;
-use App\Domain\Exception\AbsenceAlreadyTakenException;
+use App\Domain\DTO\AbsenceDeposerDTO;
+use App\Domain\DTO\AbsenceModifierDTO;
+use App\Domain\Exception\AbsenceDejaDeposeeException;
 use App\Domain\Exception\AbsenceDatesInvalidesException;
 use App\Domain\Exception\AbsenceJoursDisponiblesInsuffisantsException;
-use App\Domain\Exception\AbsenceNotFoundException;
-use App\Domain\Exception\PersonneNotFoundException;
+use App\Domain\Exception\AbsenceNonTrouveeException;
+use App\Domain\Exception\PersonneNonTrouveeException;
 use App\Domain\Personne;
 use App\Domain\Repository\PersonneRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -46,7 +45,7 @@ class AbsenceController
     {
         try {
             $personne = $personneRepository->get($email);
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -75,16 +74,15 @@ class AbsenceController
      * @param Request                     $request
      * @param FormFactoryInterface        $formFactory
      * @param UrlGeneratorInterface       $urlGenerator
-     * @param PersonneService             $personneService
      * @param PersonneRepositoryInterface $personneRepository
      *
      * @return array|RedirectResponse
      */
-    public function deposer(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneService $personneService, PersonneRepositoryInterface $personneRepository)
+    public function deposer(string $email, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository)
     {
         try {
             $personne = $personneRepository->get($email);
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -94,10 +92,10 @@ class AbsenceController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $personneService->deposerAbsence($personne, $deposerAbsenceDTO);
+                $personne->deposerAbsence($deposerAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceDatesInvalidesException | AbsenceAlreadyTakenException | AbsenceJoursDisponiblesInsuffisantsException $e) {
+            } catch (AbsenceDatesInvalidesException | AbsenceDejaDeposeeException | AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -118,16 +116,15 @@ class AbsenceController
      * @param FormFactoryInterface        $formFactory
      * @param UrlGeneratorInterface       $urlGenerator
      * @param PersonneRepositoryInterface $personneRepository
-     * @param PersonneService             $personneFactory
      *
      * @return array|RedirectResponse
      */
-    public function modifier(string $email, string $id, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository, PersonneService $personneFactory)
+    public function modifier(string $email, string $id, Request $request, FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, PersonneRepositoryInterface $personneRepository)
     {
         try {
             $personne = $personneRepository->get($email);
             $absence = $personne->getAbsence($id);
-        } catch (PersonneNotFoundException | AbsenceNotFoundException $e) {
+        } catch (PersonneNonTrouveeException | AbsenceNonTrouveeException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -137,10 +134,10 @@ class AbsenceController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $personneFactory->modifierAbsence($personne, $modifierAbsenceDTO);
+                $personne->modifierAbsence($modifierAbsenceDTO);
 
                 return new RedirectResponse($urlGenerator->generate('personne_absence_calendrier', ['email' => $email]));
-            } catch (AbsenceDatesInvalidesException | AbsenceAlreadyTakenException | AbsenceJoursDisponiblesInsuffisantsException $e) {
+            } catch (AbsenceDatesInvalidesException | AbsenceDejaDeposeeException | AbsenceJoursDisponiblesInsuffisantsException $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -166,7 +163,7 @@ class AbsenceController
         try {
             $personne = $personneRepository->get($email);
             $personne->annulerAbsence($id);
-        } catch (PersonneNotFoundException | AbsenceNotFoundException $e) {
+        } catch (PersonneNonTrouveeException | AbsenceNonTrouveeException $e) {
             throw new NotFoundHttpException();
         }
 
@@ -186,7 +183,7 @@ class AbsenceController
     {
         try {
             $personne = $personneRepository->get($email);
-        } catch (PersonneNotFoundException $e) {
+        } catch (PersonneNonTrouveeException $e) {
             throw new NotFoundHttpException();
         }
 
