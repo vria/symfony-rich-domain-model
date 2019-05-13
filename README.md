@@ -17,16 +17,19 @@ Modèle de domaine riche dans l'app Symfony
   - [PersonneRepositoryInterface]
   - [AbsenceRepositoryInterface]
 - DTOs:
+  - [PersonneCreerDTO]
+  - [AbsenceDeposerDTO]
+  - [AbsenceModifierDTO]
   - [CompteurInfoDTO]
 - Exceptions:
-  - [PersonneNotFoundException]
-  - [PersonneEmailAlreadyTakenException]
+  - [PersonneNonTrouveeException]
+  - [PersonneEmailDejaEnregistreException]
+  - [AbsenceNonTrouveeException]
+  - [AbsenceTypeInvalideException]
   - [AbsenceDatesInvalidesException]
   - [AbsenceDatesDansLePasseException]
-  - [AbsenceTypeInvalidException]
-  - [AbsenceAlreadyTakenException]
+  - [AbsenceDejaDeposeeException]
   - [AbsenceJoursDisponiblesInsuffisantsException]
-  - [AbsenceNotFoundException]
 
 Veuillez regarder les commentaires dans les fichiers sources.
 
@@ -53,7 +56,6 @@ Lancer les tests *sans changer les données dans la bdd*:
 vendor/bin/phpunit
 ```
 
-
 [Personne]: src/Domain/Personne.php
 [Absence]: src/Domain/Absence.php
 [AbsenceType]: src/Domain/AbsenceType.php
@@ -61,12 +63,15 @@ vendor/bin/phpunit
 [AbsenceCompteurService]: src/Domain/Service/AbsenceCompteurService.php
 [PersonneRepositoryInterface]: src/Domain/Repository/PersonneRepositoryInterface.php
 [AbsenceRepositoryInterface]: src/Domain/Repository/AbsenceRepositoryInterface.php
+[PersonneCreerDTO]: src/Domain/DTO/PersonneCreerDTO.php
+[AbsenceDeposerDTO]: src/Domain/DTO/AbsenceDeposerDTO.php
+[AbsenceModifierDTO]: src/Domain/DTO/AbsenceModifierDTO.php
 [CompteurInfoDTO]: src/Domain/DTO/CompteurInfoDTO.php
-[PersonneNotFoundException]: src/Domain/Exception/PersonneNonTrouveeException.php
-[PersonneEmailAlreadyTakenException]: src/Domain/Exception/PersonneEmailDejaEnregistreException.php
+[PersonneNonTrouveeException]: src/Domain/Exception/PersonneNonTrouveeException.php
+[PersonneEmailDejaEnregistreException]: src/Domain/Exception/PersonneEmailDejaEnregistreException.php
+[AbsenceNonTrouveeException]: src/Domain/Exception/AbsenceNonTrouveeException.php
+[AbsenceTypeInvalideException]: src/Domain/Exception/AbsenceTypeInvalideException.php
 [AbsenceDatesInvalidesException]: src/Domain/Exception/AbsenceDatesInvalidesException.php
 [AbsenceDatesDansLePasseException]: src/Domain/Exception/AbsenceDatesDansLePasseException.php
-[AbsenceTypeInvalidException]: src/Domain/Exception/AbsenceTypeInvalideException.php
-[AbsenceAlreadyTakenException]: src/Domain/Exception/AbsenceDejaDeposeeException.php
+[AbsenceDejaDeposeeException]: src/Domain/Exception/AbsenceDejaDeposeeException.php
 [AbsenceJoursDisponiblesInsuffisantsException]: src/Domain/Exception/AbsenceJoursDisponiblesInsuffisantsException.php
-[AbsenceNotFoundException]: src/Domain/Exception/AbsenceNonTrouveeException.php
